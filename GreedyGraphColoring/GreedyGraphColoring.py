@@ -1,5 +1,6 @@
 from Graph import Graph
 
+
 # Greedy graph coloring algorithm
 class GreedyGraphColoring:
     def __init__(self, g):
