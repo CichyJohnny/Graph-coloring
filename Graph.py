@@ -36,7 +36,8 @@ class Graph:
                     self.edges.append((i, j))
                     self.e += 1
 
-        with open("./tests/test1.txt", 'w') as f:
+        path = f"./tests/test_{v}-{density}-{self.e}.txt"
+        with open(path, 'w') as f:
             f.write(f"{self.v} {self.e}\n")
 
             for a, b in self.edges:
