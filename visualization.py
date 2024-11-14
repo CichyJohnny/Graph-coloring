@@ -8,8 +8,7 @@ from GreedyGraphColoring.GreedyGraphColoring import GreedyGraphColoring
 
 ################################################################
 # Adjustable
-# filename = 'GreedyGraphColoring/GraphInput.txt'
-filename = 'tests/test1.txt'
+filename = 'GreedyGraphColoring/GraphInput.txt'
 algorithm = GreedyGraphColoring
 ################################################################
 
@@ -34,8 +33,8 @@ if myGraph.v < len(node_colors):
 
         color_map = [node_colors[i] for i in [gc.colors[node] for node in G.nodes()]]
 
-        # Draw graph
-        pos = nx.spring_layout(G)
-        nx.draw(G, pos, with_labels=True, node_color=color_map, font_weight='bold')
+# Draw graph
+pos = nx.spring_layout(G)
+nx.draw(G, pos, with_labels=True, node_color=color_map, font_weight='bold')
 
-        plt.show()
+plt.show()
