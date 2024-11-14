@@ -1,5 +1,5 @@
 from Graph import Graph
-from GenAlg import GenAlg
+from GeneticAlgorithmGraphColoring import GeneticAlgorithmGraphColoring as GenAlg
 
 if __name__ == "__main__":
     ################################################################
