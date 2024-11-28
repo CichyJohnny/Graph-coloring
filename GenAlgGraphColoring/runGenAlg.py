@@ -1,5 +1,5 @@
 from GraphAdjMatrix import GraphAdjMatrix
-from GenAlgAdjMatrixGColoring import GeneticAlgorithmGraphColoring as GenAlg
+from GenAlgAdjMatrixGC import GeneticAlgorithmGraphColoring as GenAlg
 
 if __name__ == "__main__":
     ################################################################
