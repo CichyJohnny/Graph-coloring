@@ -1,9 +1,11 @@
 import random
 import time
 
+from typing import Union
 from matplotlib import pyplot as plt
 
 from GraphAdjMatrix import GraphAdjMatrix
+from GraphAdjList import GraphAdjList
 from Individual import Individual
 
 
@@ -16,7 +18,13 @@ mutation_times = []
 
 # Genetic Algorithm for Graph Coloring with adjustable parameters
 class GeneticAlgorithmGraphColoring:
-    def __init__(self, graph: GraphAdjMatrix, population_size: int, mutation_rate: float, visualise: bool=False):
+    def __init__(self,
+                 graph: Union[GraphAdjMatrix, GraphAdjList],
+                 population_size: int,
+                 mutation_rate: float,
+                 visualise: bool=False):
+
+        self.representation = "matrix" if isinstance(graph, GraphAdjMatrix) else "list"
         self.graph = graph
         self.chromosome_size = graph.v
 
@@ -192,7 +200,9 @@ class GeneticAlgorithmGraphColoring:
 
 # Main script
 if __name__ == "__main__":
-    g = GraphAdjMatrix()
+    # g = GraphAdjMatrix()
+    g = GraphAdjList()
+
     g.load_from_file('GraphInput.txt', 1)
 
     gen_alg = GeneticAlgorithmGraphColoring(g, 100, 0.2)
