@@ -190,7 +190,7 @@ class GeneticAlgorithmGraphColoring:
 # Main script
 if __name__ == "__main__":
     g = Graph()
-    g.load_from_file('GraphInput.txt')
+    g.load_from_file('GraphInput.txt', 1)
 
     gen_alg = GeneticAlgorithmGraphColoring(g, 100, 0.2)
     gen_alg.start()
