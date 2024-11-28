@@ -1,10 +1,10 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import time
-from Graph import Graph
+from GraphAdjMatrix import GraphAdjMatrix
 
 # Import here your algorithms
-from GreedyGraphColoring.GreedyGraphColoring import GreedyGraphColoring
+from GreedyGraphColoring.GreedyGC import GreedyGraphColoring
 
 ################################################################
 # Adjustable
@@ -12,7 +12,7 @@ filename = 'GreedyGraphColoring/GraphInput.txt'
 algorithm = GreedyGraphColoring
 ################################################################
 
-myGraph = Graph()
+myGraph = GraphAdjMatrix()
 myGraph.load_from_file(filename)
 
 gc = algorithm(myGraph)

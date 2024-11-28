@@ -1,4 +1,4 @@
-from Graph import Graph
+from GraphAdjMatrix import GraphAdjMatrix
 
 
 # Greedy graph coloring algorithm
@@ -31,7 +31,7 @@ class GreedyGraphColoring:
 
 
 if __name__ == "__main__":
-    g = Graph()
+    g = GraphAdjMatrix()
     g.load_from_file('GraphInput.txt')
 
     gc = GreedyGraphColoring(g)

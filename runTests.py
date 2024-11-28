@@ -1,7 +1,7 @@
 import os
 import time
-from GreedyGraphColoring.GreedyGraphColoring import GreedyGraphColoring
-from Graph import Graph
+from GreedyGraphColoring.GreedyGC import GreedyGraphColoring
+from GraphAdjMatrix import GraphAdjMatrix
 
 
 def run_all_tests(directory):
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     scores = []
     for path in paths:
         print("Running test for\t", path)
-        G = Graph()
+        G = GraphAdjMatrix()
         G.load_from_file(path)
         s = []
 
