@@ -1,4 +1,6 @@
 import random
+import time
+
 from matplotlib import pyplot as plt
 
 from Graph import Graph
@@ -35,11 +37,17 @@ class GeneticAlgorithmGraphColoring:
             generation += 1
 
             # Standard genetic: selection, crossover, mutation
+            start = time.perf_counter()
             self.roulette_wheel_selection()
+            print("Selection time: ", time.perf_counter() - start)
 
+            start = time.perf_counter()
             self.mating()
+            print("Crossover time: ", time.perf_counter() - start)
 
+            start = time.perf_counter()
             self.mutation()
+            print("Mutation time: ", time.perf_counter() - start)
 
             # Find the best individual in the population
             for individual in self.population:
