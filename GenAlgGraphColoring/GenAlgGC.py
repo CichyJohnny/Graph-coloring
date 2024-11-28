@@ -1,8 +1,10 @@
 import random
 import time
 
+from typing import Union
 from matplotlib import pyplot as plt
 
+from GraphAdjMatrix import GraphAdjMatrix
 from GraphAdjList import GraphAdjList
 from Individual import Individual
 
@@ -16,7 +18,13 @@ mutation_times = []
 
 # Genetic Algorithm for Graph Coloring with adjustable parameters
 class GeneticAlgorithmGraphColoring:
-    def __init__(self, graph: GraphAdjList, population_size: int, mutation_rate: float, visualise: bool=False):
+    def __init__(self,
+                 graph: Union[GraphAdjMatrix, GraphAdjList],
+                 population_size: int,
+                 mutation_rate: float,
+                 visualise: bool=False):
+
+        self.representation = "matrix" if isinstance(graph, GraphAdjMatrix) else "list"
         self.graph = graph
         self.chromosome_size = graph.v
 
@@ -83,20 +91,38 @@ class GeneticAlgorithmGraphColoring:
     def get_num_of_colors(self) -> int:
         for i in range(self.graph.v):
 
-            # The Maximum number of colors is the maximum degree of the graph + 1
-            if len(self.graph.list[i]) > self.number_of_colors:
-                self.number_of_colors = len(self.graph.list[i]) + 1
+            if self.representation == "matrix":
+
+                # The Maximum number of colors is the maximum degree of the graph + 1
+                if sum(self.graph.matrix[i]) > self.number_of_colors:
+                    self.number_of_colors = sum(self.graph.matrix[i]) + 1
+
+            else:
+
+                if len(self.graph.list[i]) > self.number_of_colors:
+                    self.number_of_colors = len(self.graph.list[i]) + 1
 
         return self.number_of_colors
 
     # Calculate the fitness of an individual
     def get_fitness(self, inv: Individual) -> int:
         for i in range(self.graph.v):
-            for j in range(len(self.graph.list[i])):
 
-                # Penalty for the same color of adjacent vertices
-                if inv.chromosome[i] == inv.chromosome[self.graph.list[i][j]]:
-                    inv.fitness += 1
+            if self.representation == "matrix":
+
+                for j in range(i, self.graph.v):
+
+                    # Penalty for the same color of adjacent vertices
+                    if self.graph.matrix[i][j] == 1 and inv.chromosome[i] == inv.chromosome[j]:
+                        inv.fitness += 1
+
+            else:
+
+                for j in range(len(self.graph.list[i])):
+
+                    # Penalty for the same color of adjacent vertices
+                    if inv.chromosome[i] == inv.chromosome[self.graph.list[i][j]]:
+                        inv.fitness += 1
 
         return inv.fitness
 
@@ -192,7 +218,9 @@ class GeneticAlgorithmGraphColoring:
 
 # Main script
 if __name__ == "__main__":
-    g = GraphAdjList()
+    g = GraphAdjMatrix()
+    # g = GraphAdjList()
+
     g.load_from_file('GraphInput.txt', 1)
 
     gen_alg = GeneticAlgorithmGraphColoring(g, 100, 0.2)
