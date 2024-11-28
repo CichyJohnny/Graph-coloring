@@ -6,6 +6,14 @@ from matplotlib import pyplot as plt
 from Graph import Graph
 from Individual import Individual
 
+
+
+selection_times = []
+crossover_times = []
+mutation_times = []
+
+
+
 # Genetic Algorithm for Graph Coloring with adjustable parameters
 class GeneticAlgorithmGraphColoring:
     def __init__(self, graph: Graph, population_size: int, mutation_rate: float, visualise: bool=False):
@@ -39,15 +47,15 @@ class GeneticAlgorithmGraphColoring:
             # Standard genetic: selection, crossover, mutation
             start = time.perf_counter()
             self.roulette_wheel_selection()
-            print("Selection time: ", time.perf_counter() - start)
+            selection_times.append(time.perf_counter() - start)
 
             start = time.perf_counter()
             self.mating()
-            print("Crossover time: ", time.perf_counter() - start)
+            crossover_times.append(time.perf_counter() - start)
 
             start = time.perf_counter()
             self.mutation()
-            print("Mutation time: ", time.perf_counter() - start)
+            mutation_times.append(time.perf_counter() - start)
 
             # Find the best individual in the population
             for individual in self.population:
@@ -149,28 +157,23 @@ class GeneticAlgorithmGraphColoring:
 
     # Elitism selection of individuals using roulette-wheel approach
     def roulette_wheel_selection(self):
-        total_fitness = 0
-
-        for individual in self.population:
-            total_fitness += 1 / (1 + self.get_fitness(individual))
-
-        cumulative_fitness = []
-        cumulative_fitness_sum = 0
-
-        for i in range(len(self.population)):
-            cumulative_fitness_sum += 1 / (1 + self.get_fitness(self.population[i])) / total_fitness
-            cumulative_fitness.append(cumulative_fitness_sum)
+        fitness_values = [1 / (1 + self.get_fitness(individual)) for individual in self.population]
+        total_fitness = sum(fitness_values)
+        cumulative_fitness = [sum(fitness_values[:i + 1]) / total_fitness for i in range(len(fitness_values))]
 
         new_population = []
         while len(new_population) < self.population_size:
             roulette = random.uniform(0, 1)
-            for j in range(len(self.population)):
-                if roulette <= cumulative_fitness[j]:
-                    new_population.append(self.population[j])
+
+            for i, cumulative_value in enumerate(cumulative_fitness):
+                if roulette <= cumulative_value:
+                    new_population.append(self.population[i])
+
                     break
 
         random.shuffle(new_population)
         self.population = new_population
+
 
     # Visualize the best fitness through generations
     @staticmethod
@@ -194,3 +197,11 @@ if __name__ == "__main__":
 
     gen_alg = GeneticAlgorithmGraphColoring(g, 100, 0.2)
     gen_alg.start()
+
+    print("Total Selection time: ", sum(selection_times))
+    print("Total Crossover time: ", sum(crossover_times))
+    print("Total Mutation time: ", sum(mutation_times))
+
+    print("Avg Selection time: ", sum(selection_times)/len(selection_times))
+    print("Avg Crossover time: ", sum(crossover_times)/len(crossover_times))
+    print("Avg Mutation time: ", sum(mutation_times)/len(mutation_times))
