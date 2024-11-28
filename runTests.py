@@ -1,6 +1,6 @@
 import os
 import time
-from GreedyGraphColoring.GreedyGraphColoring import GreedyGraphColoring
+from GreedyGraphColoring.GrGColoring import GreedyGraphColoring
 from GraphAdjMatrix import GraphAdjMatrix
 
 

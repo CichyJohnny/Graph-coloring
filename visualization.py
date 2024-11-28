@@ -4,7 +4,7 @@ import time
 from GraphAdjMatrix import GraphAdjMatrix
 
 # Import here your algorithms
-from GreedyGraphColoring.GreedyGraphColoring import GreedyGraphColoring
+from GreedyGraphColoring.GrGColoring import GreedyGraphColoring
 
 ################################################################
 # Adjustable
