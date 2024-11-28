@@ -2,8 +2,8 @@ import random
 import time
 
 
-# Simple graph class with adjacency matrix representation
-class Graph:
+# Simple graph class with adjacency list representation
+class GraphAdjMatrix:
     def __init__(self):
         self.v = 0
         self.e = 0
