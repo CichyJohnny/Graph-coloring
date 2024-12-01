@@ -12,13 +12,6 @@ from src.Fitness import Fitness
 from src.Visualization import Visualization
 
 
-
-selection_times = []
-crossover_times = []
-mutation_times = []
-
-
-
 # Genetic Algorithm for Graph Coloring with adjustable parameters
 class GeneticAlgorithmGraphColoring:
     def __init__(self, graph: Union[GraphAdjMatrix, GraphAdjList], population_size: int, mutation_rate: float, visualise: bool=False):
@@ -35,47 +28,64 @@ class GeneticAlgorithmGraphColoring:
     def start(self):
         # Initialize starting settings
         self.get_num_of_colors()
-        self.population = self.generate_population()
-        generation = 0
-        best_fitness_list = []
-        best_fit = float("inf")
-        best_individual = None
+        t = time.perf_counter()
 
-        # Genetic algorithm while loop until local minimum is found
-        while best_fit != 0:
-            generation += 1
+        # Genetic algorithm for each number of colors
+        while True:
+            self.population = self.generate_population()
+            generation = 0
+            best_fitness_list = []
+            best_fit = float("inf")
+            best_individual = None
 
-            # Standard genetic: selection, crossover, mutation
-            start = time.perf_counter()
-            self.population = Selection.roulette_wheel_selection(self.population, self.get_fitness)
-            selection_times.append(time.perf_counter() - start)
+            selection_times = []
+            crossover_times = []
+            mutation_times = []
 
-            start = time.perf_counter()
-            self.mating()
-            crossover_times.append(time.perf_counter() - start)
+            # Genetic algorithm while loop for each generation
+            while best_fit != 0:
+                generation += 1
 
-            start = time.perf_counter()
-            Mutation.mutation(self.population, self.chromosome_size, self.number_of_colors, self.mutation_rate)
-            mutation_times.append(time.perf_counter() - start)
+                # Standard genetic: selection, crossover, mutation
+                start = time.perf_counter()
+                self.population = Selection.roulette_wheel_selection(self.population, self.get_fitness)
+                selection_times.append(time.perf_counter() - start)
 
-            # Find the best individual in the population
-            for individual in self.population:
-                fit = self.get_fitness(individual)
-                if fit < best_fit:
-                    best_fit = fit
-                    best_individual = individual
+                start = time.perf_counter()
+                self.mating()
+                crossover_times.append(time.perf_counter() - start)
 
-            best_fitness_list.append(best_fit)
+                start = time.perf_counter()
+                Mutation.mutation(self.population, self.chromosome_size, self.number_of_colors, self.mutation_rate)
+                mutation_times.append(time.perf_counter() - start)
 
-            # Summarize the results of the generation
-            print("Current generation: ", generation)
-            print("Best fitness: ", best_fit)
-            print("Best chromosome: ", best_individual.chromosome)
-            print("Number of colors: ", self.number_of_colors)
-            print("--------------------------------------------------")
+                # Find the best individual in the population
+                for individual in self.population:
+                    fit = self.get_fitness(individual)
+                    if fit < best_fit:
+                        best_fit = fit
+                        best_individual = individual
 
-            if generation % 50 == 0 and self.visualise:
-                Visualization.visualize(generation, best_fitness_list)
+                best_fitness_list.append(best_fit)
+
+            else:
+                if self.visualise:
+                    Visualization.visualize(generation, best_fitness_list, self.number_of_colors)
+
+                print(f"==================================================")
+                print(f"Succeeded for {self.number_of_colors} colors")
+                print(f"In {generation} generations")
+                print(f"Best chromosome: {best_individual.chromosome}")
+                print(f"Time taken: {round(time.perf_counter() - t, 2)}")
+                print(f"--------------------------------------------------")
+                print("Avg Selection time: ", sum(selection_times) / len(selection_times))
+                print("Avg Crossover time: ", sum(crossover_times) / len(crossover_times))
+                print("Avg Mutation time: ", sum(mutation_times) / len(mutation_times))
+                print(f"--------------------------------------------------")
+                print(f"Trying for {self.number_of_colors - 1} colors")
+
+                self.number_of_colors -= 1
+
 
     # Get the number of colors needed for the graph
     def get_num_of_colors(self) -> int:
@@ -119,17 +129,11 @@ class GeneticAlgorithmGraphColoring:
         self.population = new_population
 
 if __name__ == "__main__":
-    # g = GraphAdjList()
-    g = GraphAdjMatrix()
+    g = GraphAdjList()
+    # g = GraphAdjMatrix()
     g.load_from_file('GraphInput.txt', 1)
 
-    gen_alg = GeneticAlgorithmGraphColoring(g, 100, 0.2)
+    gen_alg = GeneticAlgorithmGraphColoring(g, 100, 0.2, visualise=True)
     gen_alg.start()
 
-    print("Total Selection time: ", sum(selection_times))
-    print("Total Crossover time: ", sum(crossover_times))
-    print("Total Mutation time: ", sum(mutation_times))
 
-    print("Avg Selection time: ", sum(selection_times)/len(selection_times))
-    print("Avg Crossover time: ", sum(crossover_times)/len(crossover_times))
-    print("Avg Mutation time: ", sum(mutation_times)/len(mutation_times))
