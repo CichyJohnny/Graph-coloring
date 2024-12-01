@@ -1,5 +1,6 @@
 class Fitness:
 
+    # Calculate the fitness of an individual
     @staticmethod
     def get_fitness(graph, inv, representation):
         for i in range(graph.v):
