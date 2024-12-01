@@ -28,6 +28,10 @@ class GeneticAlgorithmGraphColoring:
     def start(self):
         # Initialize starting settings
         self.get_num_of_colors()
+
+        crossover = Crossover(self.population_size, self.chromosome_size)
+        mutator = Mutation(self.chromosome_size)
+
         t = time.perf_counter()
 
         # Genetic algorithm for each number of colors
@@ -52,11 +56,11 @@ class GeneticAlgorithmGraphColoring:
                 selection_times.append(time.perf_counter() - start)
 
                 start = time.perf_counter()
-                self.mating()
+                self.population = crossover.crossover(self.population)
                 crossover_times.append(time.perf_counter() - start)
 
                 start = time.perf_counter()
-                Mutation.mutation(self.population, self.chromosome_size, self.number_of_colors, self.mutation_rate)
+                mutator.mutation(self.population, self.number_of_colors, self.mutation_rate)
                 mutation_times.append(time.perf_counter() - start)
 
                 # Find the best individual in the population
@@ -116,17 +120,6 @@ class GeneticAlgorithmGraphColoring:
 
         return population
 
-    # Cross every two parent individuals to create two children individuals
-    def mating(self) -> None:
-        new_population = []
-
-        # Cross every two parent individuals to create two children individuals
-        for i in range(0, self.population_size - 1, 2):
-            child1, child2 = Crossover.crossover(self.population[i], self.population[i + 1], self.chromosome_size)
-            new_population.append(child1)
-            new_population.append(child2)
-
-        self.population = new_population
 
 if __name__ == "__main__":
     g = GraphAdjList()
@@ -135,5 +128,3 @@ if __name__ == "__main__":
 
     gen_alg = GeneticAlgorithmGraphColoring(g, 100, 0.2, visualise=True)
     gen_alg.start()
-
-
