@@ -21,3 +21,14 @@ class GraphAdjMatrix:
                 self.edges.append((a, b))
                 self.matrix[a][b] = 1
                 self.matrix[b][a] = 1
+
+
+    # Get the maximum number of colors needed for the graph
+    def get_max_colors(self):
+        number_of_colors = -1
+
+        for i in range(self.v):
+            if sum(self.matrix[i]) > number_of_colors:
+                number_of_colors = sum(self.matrix[i]) + 1
+
+        return number_of_colors

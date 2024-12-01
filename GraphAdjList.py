@@ -20,3 +20,14 @@ class GraphAdjList:
 
                 self.edges.append((a, b))
                 self.list[a].append(b)
+
+
+    # Get the maximum number of colors needed for the graph
+    def get_max_colors(self) -> int:
+        number_of_colors = -1
+
+        for i in range(self.v):
+            if len(self.list[i]) > number_of_colors:
+                number_of_colors = len(self.list[i]) + 1
+
+        return number_of_colors

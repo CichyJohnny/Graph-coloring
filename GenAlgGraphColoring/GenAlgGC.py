@@ -27,7 +27,7 @@ class GeneticAlgorithmGraphColoring:
     # Main method to start the genetic algorithm
     def start(self):
         # Initialize starting settings
-        self.get_num_of_colors()
+        self.number_of_colors = self.graph.get_max_colors()
 
         crossover = Crossover(self.population_size, self.chromosome_size)
         mutator = Mutation(self.chromosome_size)
@@ -91,21 +91,7 @@ class GeneticAlgorithmGraphColoring:
                 self.number_of_colors -= 1
 
 
-    # Get the number of colors needed for the graph
-    def get_num_of_colors(self) -> int:
-        for i in range(self.graph.v):
-
-            if self.representation == "matrix":
-                if sum(self.graph.matrix[i]) > self.number_of_colors:
-                    self.number_of_colors = sum(self.graph.matrix[i]) + 1
-
-            else:
-                if len(self.graph.list[i]) > self.number_of_colors:
-                    self.number_of_colors = len(self.graph.list[i]) + 1
-
-        return self.number_of_colors
-
-    # Calculate the fitness of an individual
+    # Helper method for fitness calculation
     def get_fitness(self, inv: Individual) -> int:
         return Fitness.get_fitness(self.graph, inv, self.representation)
 
