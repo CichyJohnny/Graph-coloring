@@ -8,7 +8,7 @@ from GreedyGraphColoring.GreedyGC import GreedyGraphColoring
 
 ################################################################
 # Adjustable
-filename = 'GreedyGraphColoring/GraphInput.txt'
+filename = 'tests/test_100-0.3-1405.txt'
 algorithm = GreedyGraphColoring
 ################################################################
 
@@ -20,6 +20,7 @@ gc = algorithm(myGraph)
 start = time.perf_counter()
 gc.start_coloring()
 print("Time: ", time.perf_counter() - start)
+print("Colors: ", gc.n)
 
 # Create color map
 # Add as many colors as needed
@@ -33,7 +34,7 @@ if gc.n < len(node_colors):
     for i in range(myGraph.e):
         G.add_edge(*myGraph.edges[i])
 
-        color_map = [node_colors[i] for i in [gc.colors[node] for node in G.nodes()]]
+    color_map = [node_colors[i] for i in [gc.colors[node] for node in G.nodes()]]
 
     # Draw graph
     pos = nx.spring_layout(G)
