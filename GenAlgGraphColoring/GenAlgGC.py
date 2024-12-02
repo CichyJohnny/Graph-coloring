@@ -47,10 +47,14 @@ class GeneticAlgorithmGraphColoring:
 
             print(f"==================================================")
             print(f"Greedy algorithm ended with {self.number_of_colors} colors")
+            print(f"--------------------------------------------------")
+            print(f"Trying for {self.number_of_colors - 1} colors")
 
         else:
             # Start with the maximum number of colors
             self.number_of_colors = self.graph.get_max_colors()
+
+        self.number_of_colors -= 1
 
         crossover = Crossover(self.population_size, self.chromosome_size)
         mutator = Mutation(self.chromosome_size)

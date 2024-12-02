@@ -20,6 +20,7 @@ class GraphAdjList:
 
                 self.edges.append((a, b))
                 self.list[a].append(b)
+                self.list[b].append(a)
 
 
     # Get the maximum number of colors needed for the graph

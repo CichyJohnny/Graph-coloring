@@ -25,11 +25,11 @@ class GreedyGraphColoring:
         for curr_v in range(1, self.graph.v):
             if self.representation == "matrix":
                 adj_index = [i for i in range(self.graph.v) if self.graph.matrix[curr_v][i] == 1]
-                adj_colors = set([self.colors[i] for i in adj_index]) - {0}
 
             else:
                 adj_index = self.graph.list[curr_v]
-                adj_colors = set([self.colors[i] for i in adj_index]) - {0}
+
+            adj_colors = set([self.colors[i] for i in adj_index]) - {0}
 
 
             if len(adj_colors) == self.n:
