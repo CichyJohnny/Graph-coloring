@@ -1,15 +1,8 @@
-from typing import Union
-
-from GenAlgGraphColoring.src.Individual import Individual
-from GraphAdjMatrix import GraphAdjMatrix
-from GraphAdjList import GraphAdjList
-
-
 class Fitness:
 
     # Calculate the fitness of an individual
     @staticmethod
-    def get_fitness(graph: Union[GraphAdjMatrix, GraphAdjList], inv: Individual, representation: str) -> int:
+    def get_fitness(graph, inv, representation):
         for i in range(graph.v):
 
             if representation == "matrix":

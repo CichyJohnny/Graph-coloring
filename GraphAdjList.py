@@ -1,23 +1,16 @@
-import numpy as np
-from numpy import ndarray
-
-
 # Simple graph class with adjacency matrix representation
 class GraphAdjList:
     def __init__(self):
         self.v = 0
         self.e = 0
         self.edges = []
-        self.list = np.empty(0, dtype=object)
+        self.list = []
 
     def load_from_file(self, filename, start_index=0):
         with open(filename, 'r') as f:
             self.v, self.e = map(int, f.readline().split())
 
-            self.list = np.empty(self.v, dtype=ndarray)
-            for i in range(self.v):
-                self.list[i] = np.array([], dtype=int)
-
+            self.list = [[] for _ in range(self.v)]
             for i in range(self.e):
                 a, b = map(int, f.readline().split())
 
@@ -26,7 +19,7 @@ class GraphAdjList:
                     b -= start_index
 
                 self.edges.append((a, b))
-                self.list[a] = np.append(self.list[a], b)
+                self.list[a].append(b)
 
 
     # Get the maximum number of colors needed for the graph

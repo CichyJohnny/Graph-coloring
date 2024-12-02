@@ -1,6 +1,5 @@
 import time
 from typing import Union
-import numpy as np
 
 from GraphAdjMatrix import GraphAdjMatrix
 from GraphAdjList import GraphAdjList
@@ -15,12 +14,7 @@ from src.Visualization import Visualization
 
 # Genetic Algorithm for Graph Coloring with adjustable parameters
 class GeneticAlgorithmGraphColoring:
-    def __init__(self,
-                 graph: Union[GraphAdjMatrix, GraphAdjList],
-                 population_size: int,
-                 mutation_rate: float,
-                 visualise: bool=False):
-
+    def __init__(self, graph: Union[GraphAdjMatrix, GraphAdjList], population_size: int, mutation_rate: float, visualise: bool=False):
         self.representation = "matrix" if isinstance(graph, GraphAdjMatrix) else "list"
         self.graph = graph
         self.chromosome_size = graph.v
@@ -102,13 +96,13 @@ class GeneticAlgorithmGraphColoring:
         return Fitness.get_fitness(self.graph, inv, self.representation)
 
     # Generate the initial population
-    def generate_population(self) -> np.ndarray:
-        population = np.empty(self.population_size, dtype=Individual)
+    def generate_population(self) -> list[Individual]:
+        population = []
 
         for i in range(self.population_size):
             individual = Individual()
             individual.create_chromosome(self.chromosome_size, self.number_of_colors)
-            population[i] = individual
+            population.append(individual)
 
         return population
 
