@@ -2,6 +2,7 @@ from GraphAdjList import GraphAdjList as AdjList
 from GraphAdjMatrix import GraphAdjMatrix as AdjMatrix
 from GenAlgGC import GeneticAlgorithmGraphColoring as GenAlg
 
+
 if __name__ == "__main__":
     ################################################################
     # Adjustable

@@ -8,7 +8,11 @@ class Mutation:
         self.chromosome_size = chromosome_size
 
     # Random mutation of the chromosome
-    def mutation(self, population: list[Individual], number_of_colors: int, mutation_rate: float):
+    def mutation(self,
+                 population: list[Individual],
+                 number_of_colors: int,
+                 mutation_rate: float
+                 ) -> None:
 
         for individual in population:
             p = random.random()

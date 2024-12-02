@@ -1,6 +1,7 @@
 import random
 from GenAlgGraphColoring.src.Individual import Individual
 
+
 class Crossover:
     def __init__(self, population_size: int, chromosome_size: int):
         self.population_size = population_size
@@ -20,7 +21,12 @@ class Crossover:
 
     # Chromosome crossover
     @staticmethod
-    def mating(inv1: Individual, inv2: Individual, chromosome_size: int) -> tuple[Individual, Individual]:
+    def mating(
+            inv1: Individual,
+            inv2: Individual,
+            chromosome_size: int
+    ) -> tuple[Individual, Individual]:
+
         cross_point = random.randint(2, chromosome_size - 2)
 
         child1 = Individual()
