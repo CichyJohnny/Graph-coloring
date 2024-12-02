@@ -10,11 +10,19 @@ from src.Crossover import Crossover
 from src.Mutation import Mutation
 from src.Fitness import Fitness
 from src.Visualization import Visualization
+from GreedyGraphColoring.GreedyGC import GreedyGraphColoring
 
 
 # Genetic Algorithm for Graph Coloring with adjustable parameters
 class GeneticAlgorithmGraphColoring:
-    def __init__(self, graph: Union[GraphAdjMatrix, GraphAdjList], population_size: int, mutation_rate: float, visualise: bool=False):
+    def __init__(self,
+                 graph: Union[GraphAdjMatrix, GraphAdjList],
+                 population_size: int,
+                 mutation_rate: float,
+                 visualise: bool=False,
+                 star_with_greedy: bool=False
+                 ):
+
         self.representation = "matrix" if isinstance(graph, GraphAdjMatrix) else "list"
         self.graph = graph
         self.chromosome_size = graph.v
@@ -22,12 +30,27 @@ class GeneticAlgorithmGraphColoring:
         self.mutation_rate = mutation_rate
         self.population = None
         self.number_of_colors = -1
+
         self.visualise = visualise
+        self.start_with_greedy = star_with_greedy
 
     # Main method to start the genetic algorithm
     def start(self):
         # Initialize starting settings
-        self.number_of_colors = self.graph.get_max_colors()
+
+        if self.start_with_greedy:
+            # Start where the greedy algorithm ended
+            greedy = GreedyGraphColoring(g)
+            greedy.start_coloring()
+
+            self.number_of_colors = greedy.n
+
+            print(f"==================================================")
+            print(f"Greedy algorithm ended with {self.number_of_colors} colors")
+
+        else:
+            # Start with the maximum number of colors
+            self.number_of_colors = self.graph.get_max_colors()
 
         crossover = Crossover(self.population_size, self.chromosome_size)
         mutator = Mutation(self.chromosome_size)
@@ -108,9 +131,14 @@ class GeneticAlgorithmGraphColoring:
 
 
 if __name__ == "__main__":
-    g = GraphAdjList()
-    # g = GraphAdjMatrix()
+    # g = GraphAdjList()
+    g = GraphAdjMatrix()
     g.load_from_file('GraphInput.txt', 1)
 
-    gen_alg = GeneticAlgorithmGraphColoring(g, 100, 0.2, visualise=True)
+    gen_alg = GeneticAlgorithmGraphColoring(g,
+                                            100,
+                                            0.2,
+                                            visualise=True,
+                                            star_with_greedy=True)
+
     gen_alg.start()
