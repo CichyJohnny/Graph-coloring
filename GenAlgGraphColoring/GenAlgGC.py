@@ -131,8 +131,8 @@ class GeneticAlgorithmGraphColoring:
 
 
 if __name__ == "__main__":
-    # g = GraphAdjList()
-    g = GraphAdjMatrix()
+    g = GraphAdjList()
+    # g = GraphAdjMatrix()
     g.load_from_file('GraphInput.txt', 1)
 
     gen_alg = GeneticAlgorithmGraphColoring(g,

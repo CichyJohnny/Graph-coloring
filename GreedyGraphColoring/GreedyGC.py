@@ -1,24 +1,36 @@
+from typing import Union
+
 from GraphAdjMatrix import GraphAdjMatrix
+from GraphAdjList import GraphAdjList
 
 
 # Greedy graph coloring algorithm
 class GreedyGraphColoring:
-    def __init__(self, g):
-        self.graph = g
-        self.colors = [0] * g.v
+    def __init__(self, graph: Union[GraphAdjMatrix, GraphAdjList]):
+        self.graph = graph
+        self.colors = [0] * graph.v
         self.n = 0
+
+        self.representation = "matrix" if isinstance(graph, GraphAdjMatrix) else "list"
+
 
     # Method that colors the graph using the greedy algorithm
     # Start with the first vertex and assign it the first color
     # For each vertex, check the colors of its adjacent vertices
-    # Assign the smallest color that is not used by any of the adjacent vertices
+    # Assign the smallest color not used by any of the adjacent vertices
     def start_coloring(self):
         self.colors[0] = 1
         self.n += 1
 
         for curr_v in range(1, self.graph.v):
-            adj_index = [i for i in range(self.graph.v) if self.graph.matrix[curr_v][i] == 1]
-            adj_colors = set([self.colors[i] for i in adj_index]) - {0}
+            if self.representation == "matrix":
+                adj_index = [i for i in range(self.graph.v) if self.graph.matrix[curr_v][i] == 1]
+                adj_colors = set([self.colors[i] for i in adj_index]) - {0}
+
+            else:
+                adj_index = self.graph.list[curr_v]
+                adj_colors = set([self.colors[i] for i in adj_index]) - {0}
+
 
             if len(adj_colors) == self.n:
                 # New Color
@@ -31,8 +43,10 @@ class GreedyGraphColoring:
 
 
 if __name__ == "__main__":
-    g = GraphAdjMatrix()
-    g.load_from_file('GraphInput.txt')
+    # g = GraphAdjMatrix()
+    g = GraphAdjList()
+
+    g.load_from_file('GraphInput.txt', start_index=1)
 
     gc = GreedyGraphColoring(g)
     gc.start_coloring()
