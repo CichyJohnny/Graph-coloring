@@ -1,6 +1,5 @@
 import time
 from typing import Union
-from concurrent.futures import ThreadPoolExecutor
 
 from GraphAdjMatrix import GraphAdjMatrix
 from GraphAdjList import GraphAdjList
@@ -41,7 +40,7 @@ class GeneticAlgorithmGraphColoring:
 
         if self.start_with_greedy:
             # Start where the greedy algorithm ended
-            greedy = GreedyGraphColoring(g)
+            greedy = GreedyGraphColoring(self.graph)
             greedy.start_coloring()
 
             self.number_of_colors = greedy.n
@@ -140,7 +139,7 @@ class GeneticAlgorithmGraphColoring:
 if __name__ == "__main__":
     g = GraphAdjList()
     # g = GraphAdjMatrix()
-    g.load_from_file('GraphInput.txt', 1)
+    g.load_from_file('../tests/gc500.txt', 1)
 
     gen_alg = GeneticAlgorithmGraphColoring(g,
                                             100,

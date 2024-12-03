@@ -46,7 +46,7 @@ if __name__ == "__main__":
     # g = GraphAdjMatrix()
     g = GraphAdjList()
 
-    g.load_from_file('GraphInput.txt', start_index=1)
+    g.load_from_file('../tests/gc500.txt', start_index=1)
 
     gc = GreedyGraphColoring(g)
     gc.start_coloring()
