@@ -57,7 +57,7 @@ class GeneticAlgorithmGraphColoring:
         self.number_of_colors -= 1
 
         crossover = Crossover(self.population_size, self.chromosome_size)
-        mutator = Mutation(self.chromosome_size)
+        mutator = Mutation(self.chromosome_size, self.graph, self.representation)
         evaluator = FitnessEvaluator(self.graph, self.representation)
 
         t = time.perf_counter()
