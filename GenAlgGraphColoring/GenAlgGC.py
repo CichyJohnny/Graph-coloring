@@ -139,12 +139,12 @@ class GeneticAlgorithmGraphColoring:
 if __name__ == "__main__":
     g = GraphAdjList()
     # g = GraphAdjMatrix()
-    g.load_from_file('../tests/gc500.txt', 1)
+    g.load_from_file('../tests/queen6.txt', 1)
 
     gen_alg = GeneticAlgorithmGraphColoring(g,
                                             100,
                                             0.2,
-                                            visualise=True,
+                                            visualise=False,
                                             star_with_greedy=True)
 
     gen_alg.start()

@@ -13,7 +13,7 @@ class FitnessEvaluator:
 
     # Threadpool fitness evaluation of the population
     def evaluate_population(self, population: list[Individual]) -> list[int]:
-        with ThreadPoolExecutor(max_workers=100) as executor:
+        with ThreadPoolExecutor(max_workers=len(population)) as executor:
             fitness_values = list(executor.map(self.get_fitness, population))
 
         return fitness_values
