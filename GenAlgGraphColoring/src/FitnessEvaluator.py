@@ -1,10 +1,13 @@
 from concurrent.futures import ThreadPoolExecutor
+from typing import Union
 
 from GenAlgGraphColoring.src.Individual import Individual
+from GraphAdjList import GraphAdjList
+from GraphAdjMatrix import GraphAdjMatrix
 
 
 class FitnessEvaluator:
-    def __init__(self, graph, representation):
+    def __init__(self, graph: Union[GraphAdjMatrix, GraphAdjList], representation: str):
         self.graph = graph
         self.representation = representation
 
@@ -16,7 +19,7 @@ class FitnessEvaluator:
         return fitness_values
 
     # Calculate the fitness of a single individual
-    def get_fitness(self, inv):
+    def get_fitness(self, inv: Individual) -> int:
         for i in range(self.graph.v):
 
             if self.representation == "matrix":
