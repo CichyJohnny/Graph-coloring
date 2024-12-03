@@ -1,5 +1,6 @@
 import time
 from typing import Union
+from concurrent.futures import ThreadPoolExecutor
 
 from GraphAdjMatrix import GraphAdjMatrix
 from GraphAdjList import GraphAdjList
@@ -8,7 +9,7 @@ from src.Individual import Individual
 from src.Selection import Selection
 from src.Crossover import Crossover
 from src.Mutation import Mutation
-from src.Fitness import Fitness
+from src.FitnessEvaluator import FitnessEvaluator
 from src.Visualization import Visualization
 from GreedyGraphColoring.GreedyGC import GreedyGraphColoring
 
@@ -58,6 +59,7 @@ class GeneticAlgorithmGraphColoring:
 
         crossover = Crossover(self.population_size, self.chromosome_size)
         mutator = Mutation(self.chromosome_size)
+        evaluator = FitnessEvaluator(self.graph, self.representation)
 
         t = time.perf_counter()
 
@@ -77,9 +79,14 @@ class GeneticAlgorithmGraphColoring:
             while best_fit != 0:
                 generation += 1
 
+                if generation % 100 == 0:
+                    print(generation, end=" ")
+
+                fitness_values = evaluator.evaluate_population(self.population)
+
                 # Standard genetic: selection, crossover, mutation
                 start = time.perf_counter()
-                self.population = Selection.roulette_wheel_selection(self.population, self.get_fitness)
+                self.population = Selection.roulette_wheel_selection(self.population, fitness_values)
                 selection_times.append(time.perf_counter() - start)
 
                 start = time.perf_counter()
@@ -91,8 +98,8 @@ class GeneticAlgorithmGraphColoring:
                 mutation_times.append(time.perf_counter() - start)
 
                 # Find the best individual in the population
-                for individual in self.population:
-                    fit = self.get_fitness(individual)
+                for i, individual in enumerate(self.population):
+                    fit = fitness_values[i]
                     if fit < best_fit:
                         best_fit = fit
                         best_individual = individual
@@ -117,10 +124,6 @@ class GeneticAlgorithmGraphColoring:
 
                 self.number_of_colors -= 1
 
-
-    # Helper method for fitness calculation
-    def get_fitness(self, inv: Individual) -> int:
-        return Fitness.get_fitness(self.graph, inv, self.representation)
 
     # Generate the initial population
     def generate_population(self) -> list[Individual]:
