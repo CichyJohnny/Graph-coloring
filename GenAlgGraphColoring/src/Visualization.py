@@ -11,7 +11,7 @@ class Visualization:
             numberOfColors: int
     ) -> None:
 
-        generations = list(range(1, generation + 1))
+        generations = list(range(0, generation + 1))
 
         plt.plot(generations, fitness)
 

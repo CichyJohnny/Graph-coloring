@@ -69,7 +69,7 @@ class GeneticAlgorithmGraphColoring:
         while True:
             self.population = self.generate_population()
             generation = 0
-            best_fitness_list = []
+            best_fitness_list = [self.number_of_colors]
             best_fit = float("inf")
             best_individual = None
 
@@ -157,13 +157,13 @@ class GeneticAlgorithmGraphColoring:
 if __name__ == "__main__":
     g = GraphAdjList()
     # g = GraphAdjMatrix()
-    g.load_from_file('../tests/gc500.txt', 1)
+    g.load_from_file('../tests/miles250.txt', 1)
 
     gen_alg = GeneticAlgorithmGraphColoring(g,
                                             100,
                                             0.2,
                                             crossover_rate=0.8,
-                                            visualise=False,
-                                            star_with_greedy=True)
+                                            visualise=True,
+                                            star_with_greedy=False)
 
     gen_alg.start()
