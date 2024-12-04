@@ -69,10 +69,8 @@ class GeneticAlgorithmGraphColoring:
         while True:
             self.population = self.generate_population()
             generation = 0
-            best_fitness_list = [self.number_of_colors]
-            best_fit = float("inf")
-            best_individual = None
 
+            evaluation_times = []
             selection_times = []
             crossover_times = []
             mutation_times = []
@@ -81,7 +79,17 @@ class GeneticAlgorithmGraphColoring:
             evaluator.evaluate_population(self.population)
 
             self.population = sorted(self.population, key=lambda x: x.fitness)
-            fitness_values = [individual.fitness for individual in self.population]
+
+            # Sort starting population by fitness
+            start = time.perf_counter()
+            evaluator.evaluate_population(self.population)
+            evaluation_times.append(time.perf_counter() - start)
+
+            self.population = sorted(self.population, key=lambda x: x.fitness)
+
+            best_individual = self.population[0]
+            best_fit = best_individual.fitness
+            best_fitness_list = [best_fit]
 
             # Genetic algorithm while loop for each generation
             while best_fit != 0:
@@ -91,17 +99,12 @@ class GeneticAlgorithmGraphColoring:
                 if generation % 100 == 0:
                     print(generation, end=" ")
 
-                # Sort the population by fitness
-                if generation == 1:
-                    # Calc all fitness values
-                    evaluator.evaluate_population(self.population)
-
-                    self.population = sorted(self.population, key=lambda x: x.fitness)
-                    fitness_values = [individual.fitness for individual in self.population]
-
                 # Standard genetic: selection, crossover, mutation
                 start = time.perf_counter()
-                next_population.extend(selector.roulette_wheel_selection(self.population, fitness_values))
+
+                next_population.extend(selector.roulette_wheel_selection(self.population))
+                # next_population.extend(selector.elitism_selection(self.population))
+
                 selection_times.append(time.perf_counter() - start)
 
                 start = time.perf_counter()
@@ -112,11 +115,13 @@ class GeneticAlgorithmGraphColoring:
                 mutator.mutation(next_population, self.number_of_colors, self.mutation_rate)
                 mutation_times.append(time.perf_counter() - start)
 
+
                 # Find the best individual in the population
+                start = time.perf_counter()
                 evaluator.evaluate_population(next_population)
+                evaluation_times.append(time.perf_counter() - start)
 
                 self.population = sorted(next_population, key=lambda x: x.fitness)
-                fitness_values = [individual.fitness for individual in self.population]
 
                 best_individual = self.population[0]
                 best_fit = best_individual.fitness
@@ -133,6 +138,7 @@ class GeneticAlgorithmGraphColoring:
                 print(f"Best chromosome: {best_individual.chromosome}")
                 print(f"Time taken: {round(time.perf_counter() - t, 2)}")
                 print(f"--------------------------------------------------")
+                print("Avg Evaluation time: ", sum(evaluation_times) / len(evaluation_times))
                 print("Avg Selection time: ", sum(selection_times) / len(selection_times))
                 print("Avg Crossover time: ", sum(crossover_times) / len(crossover_times))
                 print("Avg Mutation time: ", sum(mutation_times) / len(mutation_times))
@@ -157,13 +163,13 @@ class GeneticAlgorithmGraphColoring:
 if __name__ == "__main__":
     g = GraphAdjList()
     # g = GraphAdjMatrix()
-    g.load_from_file('../tests/miles250.txt', 1)
+    g.load_from_file('../tests/le450_5a.txt', 1)
 
     gen_alg = GeneticAlgorithmGraphColoring(g,
                                             100,
                                             0.2,
                                             crossover_rate=0.8,
-                                            visualise=True,
+                                            visualise=False,
                                             star_with_greedy=False)
 
     gen_alg.start()

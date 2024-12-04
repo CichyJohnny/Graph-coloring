@@ -1,5 +1,4 @@
 import random
-from typing import Callable
 
 from GenAlgGraphColoring.src.Individual import Individual
 
@@ -10,12 +9,9 @@ class Selection:
         self.crossover_rate = crossover_rate
 
     # Selection of individuals using roulette-wheel approach
-    def roulette_wheel_selection(self,
-            population: list[Individual],
-            fitness_values: list[int]
-    ) -> list[Individual]:
+    def roulette_wheel_selection(self, population: list[Individual]) -> list[Individual]:
 
-        relative_fitness = [1 / (1 + i) for i in fitness_values]
+        relative_fitness = [1 / (1 + i.fitness) for i in population]
         total_fitness = sum(relative_fitness)
         cumulative_fitness = [sum(relative_fitness[:i + 1]) / total_fitness for i in range(len(relative_fitness))]
 
@@ -30,5 +26,13 @@ class Selection:
                     break
 
         random.shuffle(new_population)
+
+        return new_population
+
+    # Return top % of the population
+    def elitism_selection(self, population: list[Individual]) -> list[Individual]:
+        top = int(self.population_size * (1 - self.crossover_rate))
+
+        new_population = population[:top]
 
         return new_population
