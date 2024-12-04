@@ -12,14 +12,15 @@ class FitnessEvaluator:
         self.representation = representation
 
     # Threadpool fitness evaluation of the population
-    def evaluate_population(self, population: list[Individual]) -> list[int]:
+    def evaluate_population(self, population: list[Individual]):
         with ThreadPoolExecutor(max_workers=len(population)) as executor:
-            fitness_values = list(executor.map(self.get_fitness, population))
+            executor.map(self.get_fitness, population)
 
-        return fitness_values
 
     # Calculate the fitness of a single individual
     def get_fitness(self, inv: Individual) -> int:
+        inv.fitness = 0
+
         for i in range(self.graph.v):
 
             if self.representation == "matrix":

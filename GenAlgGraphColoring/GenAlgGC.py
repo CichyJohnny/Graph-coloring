@@ -19,6 +19,7 @@ class GeneticAlgorithmGraphColoring:
                  graph: Union[GraphAdjMatrix, GraphAdjList],
                  population_size: int,
                  mutation_rate: float,
+                 crossover_rate: float,
                  visualise: bool=False,
                  star_with_greedy: bool=False
                  ):
@@ -28,6 +29,7 @@ class GeneticAlgorithmGraphColoring:
         self.chromosome_size = graph.v
         self.population_size = population_size
         self.mutation_rate = mutation_rate
+        self.crossover_rate = crossover_rate
         self.population = None
         self.number_of_colors = -1
 
@@ -56,7 +58,8 @@ class GeneticAlgorithmGraphColoring:
 
         self.number_of_colors -= 1
 
-        crossover = Crossover(self.population_size, self.chromosome_size)
+        selector = Selection(self.population_size, self.crossover_rate)
+        crossover = Crossover(self.population_size, self.chromosome_size, self.crossover_rate)
         mutator = Mutation(self.chromosome_size, self.graph, self.representation)
         evaluator = FitnessEvaluator(self.graph, self.representation)
 
@@ -74,34 +77,49 @@ class GeneticAlgorithmGraphColoring:
             crossover_times = []
             mutation_times = []
 
+            # Starting population
+            evaluator.evaluate_population(self.population)
+
+            self.population = sorted(self.population, key=lambda x: x.fitness)
+            fitness_values = [individual.fitness for individual in self.population]
+
             # Genetic algorithm while loop for each generation
             while best_fit != 0:
                 generation += 1
+                next_population = []
 
                 if generation % 100 == 0:
                     print(generation, end=" ")
 
-                fitness_values = evaluator.evaluate_population(self.population)
+                # Sort the population by fitness
+                if generation == 1:
+                    # Calc all fitness values
+                    evaluator.evaluate_population(self.population)
+
+                    self.population = sorted(self.population, key=lambda x: x.fitness)
+                    fitness_values = [individual.fitness for individual in self.population]
 
                 # Standard genetic: selection, crossover, mutation
                 start = time.perf_counter()
-                self.population = Selection.roulette_wheel_selection(self.population, fitness_values)
+                next_population.extend(selector.roulette_wheel_selection(self.population, fitness_values))
                 selection_times.append(time.perf_counter() - start)
 
                 start = time.perf_counter()
-                self.population = crossover.crossover(self.population)
+                next_population.extend(crossover.crossover(self.population))
                 crossover_times.append(time.perf_counter() - start)
 
                 start = time.perf_counter()
-                mutator.mutation(self.population, self.number_of_colors, self.mutation_rate)
+                mutator.mutation(next_population, self.number_of_colors, self.mutation_rate)
                 mutation_times.append(time.perf_counter() - start)
 
                 # Find the best individual in the population
-                for i, individual in enumerate(self.population):
-                    fit = fitness_values[i]
-                    if fit < best_fit:
-                        best_fit = fit
-                        best_individual = individual
+                evaluator.evaluate_population(next_population)
+
+                self.population = sorted(next_population, key=lambda x: x.fitness)
+                fitness_values = [individual.fitness for individual in self.population]
+
+                best_individual = self.population[0]
+                best_fit = best_individual.fitness
 
                 best_fitness_list.append(best_fit)
 
@@ -139,11 +157,12 @@ class GeneticAlgorithmGraphColoring:
 if __name__ == "__main__":
     g = GraphAdjList()
     # g = GraphAdjMatrix()
-    g.load_from_file('../tests/queen6.txt', 1)
+    g.load_from_file('../tests/gc500.txt', 1)
 
     gen_alg = GeneticAlgorithmGraphColoring(g,
                                             100,
                                             0.2,
+                                            crossover_rate=0.8,
                                             visualise=False,
                                             star_with_greedy=True)
 

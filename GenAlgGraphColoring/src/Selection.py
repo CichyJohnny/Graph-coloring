@@ -5,10 +5,12 @@ from GenAlgGraphColoring.src.Individual import Individual
 
 
 class Selection:
+    def __init__(self, population_size: int, crossover_rate: float):
+        self.population_size = population_size
+        self.crossover_rate = crossover_rate
 
     # Selection of individuals using roulette-wheel approach
-    @staticmethod
-    def roulette_wheel_selection(
+    def roulette_wheel_selection(self,
             population: list[Individual],
             fitness_values: list[int]
     ) -> list[Individual]:
@@ -18,7 +20,7 @@ class Selection:
         cumulative_fitness = [sum(relative_fitness[:i + 1]) / total_fitness for i in range(len(relative_fitness))]
 
         new_population = []
-        while len(new_population) < len(population):
+        while len(new_population) < int(self.population_size * (1 - self.crossover_rate)):
             roulette = random.uniform(0, 1)
 
             for i, cumulative_value in enumerate(cumulative_fitness):
