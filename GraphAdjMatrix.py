@@ -1,6 +1,7 @@
 # Simple graph class with adjacency list representation
 class GraphAdjMatrix:
     def __init__(self):
+        self.representation = "matrix"
         self.v = 0
         self.e = 0
         self.edges = []
