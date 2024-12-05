@@ -1,4 +1,6 @@
 import random
+import numpy as np
+
 from GenAlgGraphColoring.src.Individual import Individual
 
 
@@ -16,26 +18,21 @@ class Crossover:
         for _ in range(int(self.population_size * self.crossover_rate)):
             parent1, parent2 = random.choices(population[:self.population_size // 2], k=2)
 
-            child1, child2 = Crossover.mating(parent1, parent2, self.chromosome_size)
-            new_population.append(child1)
-            new_population.append(child2)
+            child = self.mating(parent1, parent2)
+            new_population.append(child)
 
         return new_population
 
     # Chromosome crossover
-    @staticmethod
-    def mating(
+    def mating(self,
             parent1: Individual,
-            parent2: Individual,
-            chromosome_size: int
-    ) -> tuple[Individual, Individual]:
+            parent2: Individual
+    ) -> Individual:
 
-        cross_point = random.randint(2, chromosome_size - 2)
+        cross_point = random.randint(2, self.chromosome_size - 2)
 
         child1 = Individual()
-        child2 = Individual()
 
-        child1.chromosome = parent1.chromosome[:cross_point] + parent2.chromosome[cross_point:]
-        child2.chromosome = parent2.chromosome[:cross_point] + parent1.chromosome[cross_point:]
+        child1.chromosome = np.concatenate((parent1.chromosome[:cross_point], parent2.chromosome[cross_point:]))
 
-        return child1, child2
+        return child1
