@@ -31,7 +31,7 @@ class Selection:
 
     # Return top % of the population
     def elitism_selection(self, population: list[Individual]) -> list[Individual]:
-        top = int(self.population_size * (1 - self.crossover_rate))
+        top = int(self.population_size * (1 - self.crossover_rate)) + 1
 
         new_population = population[:top]
 
