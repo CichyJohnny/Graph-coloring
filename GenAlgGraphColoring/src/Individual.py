@@ -1,11 +1,10 @@
-import random
-
+import numpy as np
 
 class Individual:
     def __init__(self):
-        self.chromosome = []
+        self.chromosome = np.array([])
         self.fitness = 0
+        self.conflicting_edges = []
 
-    def create_chromosome(self, chromosome_size: int, upper_bound: int) -> None:
-        for i in range(chromosome_size):
-            self.chromosome.append(random.randint(0, upper_bound))
+    def create_chromosome(self, chromosome_size: int, number_of_colors: int) -> None:
+        self.chromosome = np.random.randint(0, number_of_colors, size=chromosome_size)
