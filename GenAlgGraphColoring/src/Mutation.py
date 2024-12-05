@@ -9,12 +9,10 @@ from GenAlgGraphColoring.src.Individual import Individual
 class Mutation:
     def __init__(self,
                  chromosome_size: int,
-                 graph: Union[GraphAdjMatrix, GraphAdjList],
-                 representation: str):
+                 graph: Union[GraphAdjMatrix, GraphAdjList]):
 
         self.chromosome_size = chromosome_size
         self.graph = graph
-        self.representation = representation
 
     # Random mutation of the chromosome
     def mutation(self,
@@ -23,23 +21,28 @@ class Mutation:
                  mutation_rate: float,
                  ) -> None:
 
-        for individual in population:
+        for i, individual in enumerate(population):
             p = random.random()
 
             if p < mutation_rate:
+                chromosome = individual.chromosome
 
-                if self.representation == "matrix":
+                for a, b in individual.conflicting_edges:
+                    if chromosome[a] == chromosome[b]:
 
-                    for i in range(self.graph.v):
-                        for j in range(i, self.graph.v):
+                        if self.graph.representation == "matrix":
+                            neigh_idx = [i for i, x in enumerate(self.graph.matrix[a]) if x == 1]
+                        else:
+                            neigh_idx = self.graph.list[a]
 
-                            if self.graph.matrix[i][j] == 1 and individual.chromosome[i] == individual.chromosome[j]:
-                                individual.chromosome[i] = random.randint(1, number_of_colors)
+                        all_colors = list(range(0, number_of_colors))
+                        neigh_colors = set(individual.chromosome[i] for i in neigh_idx)
+                        available_colors = list(set(all_colors) - neigh_colors - {individual.chromosome[a]})
 
-                else:
+                        if available_colors:
+                            individual.chromosome[a] = random.choice(available_colors)
+                        else:
+                            individual.chromosome[a] = random.choice(all_colors)
 
-                    for i in range(self.graph.v):
-                        for j in range(len(self.graph.list[i])):
 
-                            if individual.chromosome[i] == individual.chromosome[self.graph.list[i][j]]:
-                                individual.chromosome[i] = random.randint(1, number_of_colors)
+                        # chromosome[a] = random.randint(0, number_of_colors)
