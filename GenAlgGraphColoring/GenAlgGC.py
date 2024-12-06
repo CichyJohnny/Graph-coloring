@@ -21,6 +21,7 @@ class GeneticAlgorithmGraphColoring:
                  population_size: int,
                  mutation_rate: float,
                  crossover_rate: float,
+                 randomness_rate: float,
                  visualise: bool=False,
                  star_with_greedy: bool=False
                  ):
@@ -30,6 +31,7 @@ class GeneticAlgorithmGraphColoring:
         self.population_size = population_size
         self.mutation_rate = mutation_rate
         self.crossover_rate = crossover_rate
+        self.randomness_rate = randomness_rate
         self.population = None
         self.next_population = None
         self.number_of_colors = -1
@@ -82,7 +84,6 @@ class GeneticAlgorithmGraphColoring:
             self.generate_population()
 
             best_fit = float("inf")
-            best_individual = None
 
             evaluation_times = []
             selection_times = []
@@ -100,22 +101,23 @@ class GeneticAlgorithmGraphColoring:
 
                 # Calculate fitness
                 start = time.perf_counter()
-
-                # evaluator.evaluate_population(self.population)
-                evaluator.evaluate_population_vectorized(self.population)
+                #
+                # # evaluator.evaluate_population(self.population)
+                # evaluator.evaluate_population_vectorized(self.population)
 
                 evaluation_times.append(time.perf_counter() - start)
 
 
 
                 # Sort population by fitness
-                self.population = sorted(self.population, key=lambda x: x.fitness)
+                self.population = sorted(self.population, key=lambda x: x.fitness)[:self.population_size]
 
                 best_individual = self.population[0]
                 best_fit = best_individual.fitness
                 best_fitness_list.append(best_fit)
 
                 if best_fit == 0:
+                    print(len(set(best_individual.chromosome)), set(best_individual.chromosome))
                     break
 
 
@@ -123,24 +125,27 @@ class GeneticAlgorithmGraphColoring:
                 # Standard genetic: selection, crossover, mutation
                 start = time.perf_counter()
 
-                # next_population.extend(selector.roulette_wheel_selection(self.population))
-                self.next_population.extend(selector.elitism_selection(self.population))
+                selected_parents = selector.roulette_wheel_selection(self.population)
+                # self.next_population.extend(selector.elitism_selection(self.population))
 
                 selection_times.append(time.perf_counter() - start)
 
 
                 start = time.perf_counter()
-                self.next_population.extend(crossover.crossover(self.population))
+                self.next_population.extend(crossover.crossover(selected_parents))
                 crossover_times.append(time.perf_counter() - start)
 
 
                 start = time.perf_counter()
-                mutator.mutation(self.next_population, self.number_of_colors, self.mutation_rate)
+                self.next_population.extend(mutator.mutation(self.population, self.number_of_colors, self.mutation_rate))
                 mutation_times.append(time.perf_counter() - start)
 
 
+                self.next_population.extend(self.create_new_individual())
 
-                self.population = self.next_population
+
+                evaluator.evaluate_population_vectorized(self.next_population)
+                self.population.extend(self.next_population)
 
 
                 if generation % 100 == 0:
@@ -153,13 +158,13 @@ class GeneticAlgorithmGraphColoring:
                 print(f"==================================================")
                 print(f"Succeeded for {self.number_of_colors} colors")
                 print(f"In {generation} generations")
-                print(f"Best chromosome: {best_individual.chromosome}")
+                # print(f"Best chromosome: {best_individual.chromosome}")
                 print(f"Time taken: {round(time.perf_counter() - t, 2)}")
                 print(f"--------------------------------------------------")
-                print("Avg Evaluation time: ", sum(evaluation_times) / len(evaluation_times))
-                print("Avg Selection time: ", sum(selection_times) / len(selection_times))
-                print("Avg Crossover time: ", sum(crossover_times) / len(crossover_times))
-                print("Avg Mutation time: ", sum(mutation_times) / len(mutation_times))
+                # print("Avg Evaluation time: ", sum(evaluation_times) / len(evaluation_times))
+                # print("Avg Selection time: ", sum(selection_times) / len(selection_times))
+                # print("Avg Crossover time: ", sum(crossover_times) / len(crossover_times))
+                # print("Avg Mutation time: ", sum(mutation_times) / len(mutation_times))
                 print(f"--------------------------------------------------")
                 print(f"Trying for {self.number_of_colors - 1} colors")
 
@@ -168,18 +173,19 @@ class GeneticAlgorithmGraphColoring:
 
     # Generate the initial population
     def generate_population(self):
+        evaluator = Evaluation(self.graph, self.population_size)
+
         if self.population:
-            evaluator = Evaluation(self.graph, self.population_size)
             evaluator.evaluate_population_vectorized(self.population)
             self.population = sorted(self.population, key=lambda x: x.fitness)
 
 
             # Adjust the existing population to ensure it doesn't contain illegal number of colors
-            for i, individual in enumerate(self.population):
+            for i, inv in enumerate(self.population):
                 if i < self.population_size // 10:
-                    individual.chromosome = np.clip(individual.chromosome, 0, self.number_of_colors)
+                    inv.chromosome = np.clip(inv.chromosome, 0, self.number_of_colors - 1)
                 else:
-                    individual.create_chromosome(self.chromosome_size, self.number_of_colors)
+                    inv.create_chromosome(self.chromosome_size, self.number_of_colors)
 
         else:
             self.population = []
@@ -188,16 +194,29 @@ class GeneticAlgorithmGraphColoring:
                 individual.create_chromosome(self.chromosome_size, self.number_of_colors)
                 self.population.append(individual)
 
+            evaluator.evaluate_population_vectorized(self.population)
+
+    def create_new_individual(self):
+        new_population = []
+
+        for _ in range(int(self.population_size * self.randomness_rate)):
+            individual = Individual()
+            individual.create_chromosome(self.chromosome_size, self.number_of_colors)
+            new_population.append(individual)
+
+        return new_population
+
 
 if __name__ == "__main__":
     g = GraphAdjList()
     # g = GraphAdjMatrix()
-    g.load_from_file('../tests/queen6.txt', 1)
+    g.load_from_file('../tests/gc500.txt', 1)
 
     gen_alg = GeneticAlgorithmGraphColoring(g,
-                                            10,
+                                            100,
+                                            0.5,
+                                            0.3,
                                             0.2,
-                                            crossover_rate=0.9,
                                             visualise=True,
                                             star_with_greedy=True)
 

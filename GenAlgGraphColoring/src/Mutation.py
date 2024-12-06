@@ -19,30 +19,32 @@ class Mutation:
                  population: list[Individual],
                  number_of_colors: int,
                  mutation_rate: float,
-                 ) -> None:
+                 ) -> list[Individual]:
 
-        for i, individual in enumerate(population):
-            p = random.random()
+        selected_mutation = population[:int(len(population) * mutation_rate)]
 
-            if p < mutation_rate:
-                chromosome = individual.chromosome
+        for individual in selected_mutation:
 
-                for a, b in individual.conflicting_edges:
-                    if chromosome[a] == chromosome[b]:
+            chromosome = individual.chromosome
 
-                        if self.graph.representation == "matrix":
-                            neigh_idx = [i for i, x in enumerate(self.graph.matrix[a]) if x == 1]
-                        else:
-                            neigh_idx = self.graph.list[a]
+            for a, b in individual.conflicting_edges:
+                if chromosome[a] == chromosome[b]:
 
-                        all_colors = list(range(0, number_of_colors))
-                        neigh_colors = set(individual.chromosome[i] for i in neigh_idx)
-                        available_colors = list(set(all_colors) - neigh_colors - {individual.chromosome[a]})
+                    if self.graph.representation == "matrix":
+                        neigh_idx = [i for i, x in enumerate(self.graph.matrix[a]) if x == 1]
+                    else:
+                        neigh_idx = self.graph.list[a]
 
-                        if available_colors:
-                            individual.chromosome[a] = random.choice(available_colors)
-                        else:
-                            individual.chromosome[a] = random.choice(all_colors)
+                    all_colors = list(range(0, number_of_colors))
+                    neigh_colors = set(individual.chromosome[i] for i in neigh_idx)
+                    available_colors = list(set(all_colors) - neigh_colors - {individual.chromosome[a]})
+
+                    if available_colors:
+                        individual.chromosome[a] = random.choice(available_colors)
+                    else:
+                        individual.chromosome[a] = random.choice(all_colors)
 
 
-                        # chromosome[a] = random.randint(0, number_of_colors)
+                    # chromosome[a] = random.randint(0, number_of_colors)
+
+        return selected_mutation
