@@ -142,7 +142,7 @@ class GeneticAlgorithmGraphColoring:
                 mutation_times.append(time.perf_counter() - start)
 
 
-                self.next_population.extend(self.create_new_individual())
+                self.next_population.extend(self.create_new_individuals(int(self.population_size * self.randomness_rate)))
 
 
                 evaluator.evaluate_population_vectorized(self.next_population)
@@ -188,18 +188,14 @@ class GeneticAlgorithmGraphColoring:
                 inv.chromosome = np.clip(inv.chromosome, 0, self.number_of_colors - 1)
 
         else:
-            self.population = []
-            for i in range(self.population_size):
-                individual = Individual()
-                individual.create_chromosome(self.chromosome_size, self.number_of_colors)
-                self.population.append(individual)
+            self.population = self.create_new_individuals(self.population_size)
 
             evaluator.evaluate_population_vectorized(self.population)
 
-    def create_new_individual(self):
+    def create_new_individuals(self, count: int) -> list[Individual]:
         new_population = []
 
-        for _ in range(int(self.population_size * self.randomness_rate)):
+        for _ in range(count):
             individual = Individual()
             individual.create_chromosome(self.chromosome_size, self.number_of_colors)
             new_population.append(individual)
