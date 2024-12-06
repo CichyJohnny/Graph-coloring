@@ -14,7 +14,7 @@ class Crossover:
     def crossover(self, population: list[Individual]) -> list[Individual]:
         new_population = []
 
-        # Cross every two parents from top 50% individuals to create two children individuals
+        # Cross every two parents from top crossover_rate% individuals to create two children individuals
         for _ in range(int(self.population_size * self.crossover_rate)):
             parent1, parent2 = random.choices(population[:self.population_size // 2], k=2)
 

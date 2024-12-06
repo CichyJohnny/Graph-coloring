@@ -35,14 +35,16 @@ class Mutation:
                     else:
                         neigh_idx = self.graph.list[a]
 
-                    all_colors = list(range(0, number_of_colors))
-                    neigh_colors = set(individual.chromosome[i] for i in neigh_idx)
-                    available_colors = list(set(all_colors) - neigh_colors - {individual.chromosome[a]})
+                    neigh_colors = set(chromosome[i] for i in neigh_idx)
+                    available_colors = [
+                        color for color in range(number_of_colors)
+                        if color not in neigh_colors and color != chromosome[a]
+                    ]
 
                     if available_colors:
-                        individual.chromosome[a] = random.choice(available_colors)
+                        chromosome[a] = random.choice(available_colors)
                     else:
-                        individual.chromosome[a] = random.choice(all_colors)
+                        chromosome[a] = random.randint(0, number_of_colors - 1)
 
 
                     # chromosome[a] = random.randint(0, number_of_colors)
