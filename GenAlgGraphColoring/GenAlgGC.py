@@ -68,7 +68,7 @@ class GeneticAlgorithmGraphColoring:
         self.number_of_colors -= 1
 
         print(f"--------------------------------------------------")
-        print(f"Trying for {self.number_of_colors} colors")
+        print(f"Trying for {self.number_of_colors} or less colors")
 
         selector = Selection(self.population_size, self.crossover_rate)
         crossover = Crossover(self.population_size, self.chromosome_size, self.crossover_rate)
@@ -83,6 +83,7 @@ class GeneticAlgorithmGraphColoring:
 
             self.generate_population()
 
+            best_individual = None
             best_fit = float("inf")
 
             evaluation_times = []
@@ -152,6 +153,8 @@ class GeneticAlgorithmGraphColoring:
                     print(f"{generation}:{best_fit}", end=" | ")
 
             if best_fit == 0:
+                self.number_of_colors = len(set(best_individual.chromosome))
+
                 if self.visualise:
                     Visualization.visualize(generation, best_fitness_list, self.number_of_colors)
 
@@ -166,7 +169,7 @@ class GeneticAlgorithmGraphColoring:
                 # print("Avg Crossover time: ", sum(crossover_times) / len(crossover_times))
                 # print("Avg Mutation time: ", sum(mutation_times) / len(mutation_times))
                 print(f"--------------------------------------------------")
-                print(f"Trying for {self.number_of_colors - 1} colors")
+                print(f"Trying for {self.number_of_colors - 1} or less colors")
 
                 self.number_of_colors -= 1
 
@@ -182,10 +185,7 @@ class GeneticAlgorithmGraphColoring:
 
             # Adjust the existing population to ensure it doesn't contain illegal number of colors
             for i, inv in enumerate(self.population):
-                if i < self.population_size // 10:
-                    inv.chromosome = np.clip(inv.chromosome, 0, self.number_of_colors - 1)
-                else:
-                    inv.create_chromosome(self.chromosome_size, self.number_of_colors)
+                inv.chromosome = np.clip(inv.chromosome, 0, self.number_of_colors - 1)
 
         else:
             self.population = []
