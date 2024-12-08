@@ -1,5 +1,6 @@
 import time
 import numpy as np
+import threading
 from copy import deepcopy
 from typing import Union
 
@@ -58,30 +59,85 @@ class GeneticAlgorithmGraphColoring:
 
     # Main method to start the genetic algorithm for graph coloring
     def start(self) -> None:
-        # Select the starting point
+        # Initialize the number of colors
         if self.start_from_greedy:
             self.start_greedy()
-
         else:
             self.start_normal()
 
+        self.multiple_thread()
 
-        self.number_of_colors -= 1
-
-        print(f"--------------------------------------------------")
-        print(f"Trying for {self.number_of_colors} or less colors")
-
-        t = time.perf_counter()
-
-        # Genetic algorithm for each number of colors
+    def single_thread(self):
         while True:
-
             # Start the genetic algorithm
-            self.genetic_run(t)
+            self.genetic_run()
+
+    def multiple_thread(self):
+        while True:
+            self.number_of_colors -= 1
+
+            # Shared state for threads
+            solution_found = threading.Event()
+            lock = threading.Lock()
+            best_solution = {"colors": 0, "population": None}  # To store the best solution
+
+            def thread_worker(starting_number_of_colors: int):
+                try:
+                    # Thread-specific genetic run
+                    local_graph_copy = deepcopy(self.graph)  # Avoid modifying shared graph instance
+                    local_population_copy = deepcopy(self.population)
+                    local_ga = GeneticAlgorithmGraphColoring(
+                        local_graph_copy,
+                        self.population_size,
+                        self.mutation_rate,
+                        self.crossover_rate,
+                        self.randomness_rate,
+                        self.increase_randomness_step,
+                        False,
+                        False,
+                    )
+
+                    local_ga.number_of_colors = starting_number_of_colors
+                    local_ga.population = local_population_copy
+                    local_ga.generate_population()
+
+                    while not solution_found.is_set():
+                        local_ga.genetic_run()
+                        if local_ga.number_of_colors < starting_number_of_colors:
+                            with lock:
+                                solution_found.set()
+                                best_solution["colors"] = local_ga.number_of_colors
+                                best_solution["individual"] = local_ga.population
+                            break
+                except Exception as e:
+                    print(f"Thread for {colors} encountered an error: {e}")
+
+            # Spawn threads
+
+            threads = []
+            n = self.number_of_colors - 2
+            for colors in range(self.number_of_colors, n, -1):
+                print(f"Trying for {colors}")
+                thread = threading.Thread(target=thread_worker, args=(colors,))
+                threads.append(thread)
+                thread.start()
+
+            # Wait for all threads to finish
+            for thread in threads:
+                thread.join()
+
+            # Final result
+            print(f"\n\nBest solution found with {best_solution['colors']} colors.\n\n")
+            self.number_of_colors = best_solution['colors']
+            self.population = best_solution['population']
+
+
+
+
 
 
     # Single run of the genetic algorithm
-    def genetic_run(self, t: float) -> None:
+    def genetic_run(self) -> None:
         # Generate the initial population
         self.generate_population()
 
@@ -131,7 +187,7 @@ class GeneticAlgorithmGraphColoring:
                 Visualization.visualize(generation, best_fitness_list, self.number_of_colors)
 
 
-            self.summarise_generation(generation, t)
+            self.summarise_generation()
 
             self.number_of_colors -= 1
 
@@ -182,13 +238,9 @@ class GeneticAlgorithmGraphColoring:
                 self.randomness_rate = self.const_randomness_rate
 
     # Print the summary of the generation
-    def summarise_generation(self, generation: int, t: float) -> None:
+    def summarise_generation(self) -> None:
         print(f"==================================================")
         print(f"Succeeded for {self.number_of_colors} colors")
-        print(f"In {generation} generations")
-        print(f"Time taken: {round(time.perf_counter() - t, 2)}")
-        print(f"--------------------------------------------------")
-        print(f"Trying for {self.number_of_colors - 1} or less colors")
 
 
     # Start genetic algorithm where the greedy algorithm ended
@@ -245,7 +297,7 @@ class GeneticAlgorithmGraphColoring:
 if __name__ == "__main__":
     g = GraphAdjList()
     # g = GraphAdjMatrix()
-    g.load_from_file('../tests/miles250.txt', 1)
+    g.load_from_file('../tests/gc500.txt', 1)
 
     gen_alg = GeneticAlgorithmGraphColoring(g,
                                             100,
