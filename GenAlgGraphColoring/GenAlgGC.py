@@ -23,6 +23,7 @@ class GeneticAlgorithmGraphColoring:
                  mutation_rate: float,
                  crossover_rate: float,
                  randomness_rate: float,
+                 increase_randomness_step: int,
                  visualise: bool=False,
                  star_with_greedy: bool=False
                  ):
@@ -37,6 +38,7 @@ class GeneticAlgorithmGraphColoring:
         self.crossover_rate = crossover_rate
         self.randomness_rate = randomness_rate
         self.const_randomness_rate = randomness_rate
+        self.increase_randomness_step = increase_randomness_step
 
         # Settings for genetic run
         self.population = None
@@ -163,7 +165,7 @@ class GeneticAlgorithmGraphColoring:
         self.evaluator.evaluate_population_vectorized(self.next_population)
         self.population.extend(self.next_population)
 
-        step = 100
+        step = self.increase_randomness_step
         if generation % step == 0:
             print(f"{generation}:{best_fit}", end=" | ")
 
@@ -250,7 +252,8 @@ if __name__ == "__main__":
                                             0.5,
                                             0.5,
                                             0.2,
-                                            visualise=True,
-                                            star_with_greedy=True)
+                                            10,
+                                            visualise=False,
+                                            star_with_greedy=False)
 
     gen_alg.start()
