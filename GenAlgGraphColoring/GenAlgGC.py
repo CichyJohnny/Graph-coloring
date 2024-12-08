@@ -68,13 +68,18 @@ class GeneticAlgorithmGraphColoring:
             self.start_normal()
 
         if self.num_threads == 1:
+            print(f"Single thread approach")
             self.single_thread()
+
         else:
+            print(f"{self.num_threads} threads approach")
             self.multiple_thread()
 
 
     def single_thread(self):
         while True:
+            self.number_of_colors -= 1
+
             # Start the genetic algorithm
             self.genetic_run()
 
@@ -101,7 +106,7 @@ class GeneticAlgorithmGraphColoring:
                         self.randomness_rate,
                         self.increase_randomness_step,
                         False,
-                        False,
+                        False
                     )
 
                     local_ga.number_of_colors = starting_number_of_colors
@@ -109,11 +114,11 @@ class GeneticAlgorithmGraphColoring:
                     local_ga.generate_population()
 
                     while not solution_found.is_set():
-                        local_ga.genetic_run()
+                        local_ga.genetic_run(solution_found=solution_found)
                         if local_ga.number_of_colors < starting_number_of_colors:
                             with lock:
                                 solution_found.set()
-                                best_solution["colors"] = min(local_ga.number_of_colors, best_solution["colors"] + 1)
+                                best_solution["colors"] = min(local_ga.number_of_colors + 1, best_solution["colors"])
                                 best_solution["individual"] = local_ga.population
                             break
                 except Exception as e:
@@ -144,7 +149,7 @@ class GeneticAlgorithmGraphColoring:
 
 
     # Single run of the genetic algorithm
-    def genetic_run(self) -> None:
+    def genetic_run(self, solution_found: threading.Event=None) -> None:
         # Generate the initial population
         self.generate_population()
 
@@ -158,6 +163,12 @@ class GeneticAlgorithmGraphColoring:
         generation = 0
         # While loop for genetic algorithm generations
         while best_fit != 0:
+            # Only if one of multiple threads
+            if not solution_found is None:
+                if solution_found.is_set():
+                    return
+
+
             generation += 1
 
             # Sort population by fitness and crop it to the population size
@@ -194,7 +205,7 @@ class GeneticAlgorithmGraphColoring:
                 Visualization.visualize(generation, best_fitness_list, self.number_of_colors)
 
 
-            self.summarise_generation()
+            self.summarise_generation(generation)
 
             self.number_of_colors -= 1
 
@@ -230,7 +241,7 @@ class GeneticAlgorithmGraphColoring:
 
         step = self.increase_randomness_step
         if generation % step == 0:
-            print(f"{generation}:{best_fit}", end=" | ")
+            print(f"{generation}:{best_fit} for {threading.current_thread().ident} thread")
 
             if len(set(best_fitness_list[:step:-1])) == 1:
                 # If the best fitness is the same for the last 10 generations
@@ -245,9 +256,11 @@ class GeneticAlgorithmGraphColoring:
                 self.randomness_rate = self.const_randomness_rate
 
     # Print the summary of the generation
-    def summarise_generation(self) -> None:
+    def summarise_generation(self, generation) -> None:
         print(f"==================================================")
         print(f"Succeeded for {self.number_of_colors} colors")
+        print(f"In {generation} generations")
+        print(f"Trying for {self.number_of_colors - 1} colors")
 
 
     # Start genetic algorithm where the greedy algorithm ended
@@ -265,12 +278,14 @@ class GeneticAlgorithmGraphColoring:
 
         print(f"==================================================")
         print(f"Greedy algorithm ended with {self.number_of_colors} colors")
+        print(f"Trying with {self.number_of_colors - 1} colors")
 
     # Start genetic algorithm with the max number of colors
     def start_normal(self) -> None:
         self.number_of_colors = self.graph.get_max_colors()
         print(f"==================================================")
         print(f"Starting with {self.number_of_colors} colors")
+        print(f"Trying for {self.number_of_colors - 1} colors")
 
 
     # Generate the initial population
@@ -314,6 +329,6 @@ if __name__ == "__main__":
                                             10,
                                             visualise=False,
                                             start_with_greedy=True,
-                                            num_threads=3)
+                                            num_threads=1)
 
     gen_alg.start()
