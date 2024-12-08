@@ -1,5 +1,6 @@
 import time
 import numpy as np
+from copy import deepcopy
 from typing import Union
 
 from GraphAdjMatrix import GraphAdjMatrix
@@ -73,7 +74,9 @@ class GeneticAlgorithmGraphColoring:
         selector = Selection(self.population_size, self.crossover_rate)
         crossover = Crossover(self.population_size, self.chromosome_size, self.crossover_rate)
         mutator = Mutation(self.chromosome_size, self.graph)
-        evaluator = Evaluation(self.graph, self.population_size)
+        evaluator = Evaluation(self.graph)
+
+        const_randomness_rate = self.randomness_rate
 
         t = time.perf_counter()
 
@@ -86,10 +89,8 @@ class GeneticAlgorithmGraphColoring:
             best_individual = None
             best_fit = float("inf")
 
-            evaluation_times = []
-            selection_times = []
-            crossover_times = []
-            mutation_times = []
+            self.randomness_rate = const_randomness_rate
+
 
             best_fitness_list = []
 
@@ -97,18 +98,7 @@ class GeneticAlgorithmGraphColoring:
             while best_fit != 0:
                 generation += 1
                 self.next_population = []
-
-
-
-                # Calculate fitness
-                start = time.perf_counter()
-                #
-                # # evaluator.evaluate_population(self.population)
-                # evaluator.evaluate_population_vectorized(self.population)
-
-                evaluation_times.append(time.perf_counter() - start)
-
-
+                copy_population = deepcopy(self.population)
 
                 # Sort population by fitness
                 self.population = sorted(self.population, key=lambda x: x.fitness)[:self.population_size]
@@ -124,33 +114,44 @@ class GeneticAlgorithmGraphColoring:
 
 
                 # Standard genetic: selection, crossover, mutation
-                start = time.perf_counter()
-
-                selected_parents = selector.roulette_wheel_selection(self.population)
-                # self.next_population.extend(selector.elitism_selection(self.population))
-
-                selection_times.append(time.perf_counter() - start)
 
 
-                start = time.perf_counter()
-                self.next_population.extend(crossover.crossover(selected_parents))
-                crossover_times.append(time.perf_counter() - start)
+                parents_size = int(self.population_size // 4)
+                selection_parents = selector.roulette_wheel_selection(copy_population, parents_size)
+                random_parents = self.create_random_individuals(int(parents_size * self.randomness_rate))
+
+                parents = list(random_parents + selection_parents)[:parents_size]
 
 
-                start = time.perf_counter()
-                self.next_population.extend(mutator.mutation(self.population, self.number_of_colors, self.mutation_rate))
-                mutation_times.append(time.perf_counter() - start)
+                self.next_population.extend(crossover.crossover(parents))
 
 
-                self.next_population.extend(self.create_new_individuals(int(self.population_size * self.randomness_rate)))
+
+                mutation_size = int(self.population_size * self.mutation_rate)
+                selection_mutates = selector.roulette_wheel_selection(copy_population, mutation_size)
+                random_mutate = self.create_random_individuals(int(mutation_size * self.randomness_rate))
+                evaluator.evaluate_population_vectorized(random_mutate)
+
+                mutates = list(random_mutate + selection_mutates)[:mutation_size]
+
+
+                self.next_population.extend(mutator.mutation(mutates, self.number_of_colors))
 
 
                 evaluator.evaluate_population_vectorized(self.next_population)
                 self.population.extend(self.next_population)
 
 
-                if generation % 100 == 0:
+                step = 10
+                if generation % step == 0:
                     print(f"{generation}:{best_fit}", end=" | ")
+
+                    if len(set(best_fitness_list[:step:-1])) == 1:
+                        if self.randomness_rate < 0.9:
+                            self.randomness_rate += 0.1
+
+                    else:
+                        self.randomness_rate = const_randomness_rate
 
             if best_fit == 0:
                 self.number_of_colors = len(set(best_individual.chromosome))
@@ -161,13 +162,7 @@ class GeneticAlgorithmGraphColoring:
                 print(f"==================================================")
                 print(f"Succeeded for {self.number_of_colors} colors")
                 print(f"In {generation} generations")
-                # print(f"Best chromosome: {best_individual.chromosome}")
                 print(f"Time taken: {round(time.perf_counter() - t, 2)}")
-                print(f"--------------------------------------------------")
-                # print("Avg Evaluation time: ", sum(evaluation_times) / len(evaluation_times))
-                # print("Avg Selection time: ", sum(selection_times) / len(selection_times))
-                # print("Avg Crossover time: ", sum(crossover_times) / len(crossover_times))
-                # print("Avg Mutation time: ", sum(mutation_times) / len(mutation_times))
                 print(f"--------------------------------------------------")
                 print(f"Trying for {self.number_of_colors - 1} or less colors")
 
@@ -176,7 +171,7 @@ class GeneticAlgorithmGraphColoring:
 
     # Generate the initial population
     def generate_population(self):
-        evaluator = Evaluation(self.graph, self.population_size)
+        evaluator = Evaluation(self.graph)
 
         if self.population:
             evaluator.evaluate_population_vectorized(self.population)
@@ -188,11 +183,11 @@ class GeneticAlgorithmGraphColoring:
                 inv.chromosome = np.clip(inv.chromosome, 0, self.number_of_colors - 1)
 
         else:
-            self.population = self.create_new_individuals(self.population_size)
+            self.population = self.create_random_individuals(self.population_size)
 
             evaluator.evaluate_population_vectorized(self.population)
 
-    def create_new_individuals(self, count: int) -> list[Individual]:
+    def create_random_individuals(self, count: int) -> list[Individual]:
         new_population = []
 
         for _ in range(count):
@@ -211,7 +206,7 @@ if __name__ == "__main__":
     gen_alg = GeneticAlgorithmGraphColoring(g,
                                             100,
                                             0.5,
-                                            0.3,
+                                            0.5,
                                             0.2,
                                             visualise=True,
                                             star_with_greedy=True)

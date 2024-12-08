@@ -17,13 +17,10 @@ class Mutation:
     # Random mutation of the chromosome
     def mutation(self,
                  population: list[Individual],
-                 number_of_colors: int,
-                 mutation_rate: float,
+                 number_of_colors: int
                  ) -> list[Individual]:
 
-        selected_mutation = population[:int(len(population) * mutation_rate)]
-
-        for individual in selected_mutation:
+        for individual in population:
 
             chromosome = individual.chromosome
 
@@ -49,4 +46,4 @@ class Mutation:
 
                     # chromosome[a] = random.randint(0, number_of_colors)
 
-        return selected_mutation
+        return population
