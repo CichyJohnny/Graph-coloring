@@ -26,7 +26,8 @@ class GeneticAlgorithmGraphColoring:
                  randomness_rate: float,
                  increase_randomness_step: int,
                  visualise: bool=False,
-                 star_with_greedy: bool=False
+                 start_with_greedy: bool=False,
+                 num_threads: int=1
                  ):
 
         # Graph settings
@@ -40,6 +41,7 @@ class GeneticAlgorithmGraphColoring:
         self.randomness_rate = randomness_rate
         self.const_randomness_rate = randomness_rate
         self.increase_randomness_step = increase_randomness_step
+        self.num_threads = num_threads
 
         # Settings for genetic run
         self.population = None
@@ -48,7 +50,7 @@ class GeneticAlgorithmGraphColoring:
 
         # Additional settings
         self.visualise = visualise
-        self.start_from_greedy = star_with_greedy
+        self.start_from_greedy = start_with_greedy
 
         # Initialization of classes
         self.selector = Selection(self.population_size, self.crossover_rate)
@@ -65,7 +67,11 @@ class GeneticAlgorithmGraphColoring:
         else:
             self.start_normal()
 
-        self.multiple_thread()
+        if self.num_threads == 1:
+            self.single_thread()
+        else:
+            self.multiple_thread()
+
 
     def single_thread(self):
         while True:
@@ -79,7 +85,8 @@ class GeneticAlgorithmGraphColoring:
             # Shared state for threads
             solution_found = threading.Event()
             lock = threading.Lock()
-            best_solution = {"colors": 0, "population": None}  # To store the best solution
+            best_solution = {"colors": self.number_of_colors,
+                             "population": None}  # To store the best solution
 
             def thread_worker(starting_number_of_colors: int):
                 try:
@@ -106,7 +113,7 @@ class GeneticAlgorithmGraphColoring:
                         if local_ga.number_of_colors < starting_number_of_colors:
                             with lock:
                                 solution_found.set()
-                                best_solution["colors"] = local_ga.number_of_colors
+                                best_solution["colors"] = min(local_ga.number_of_colors, best_solution["colors"] + 1)
                                 best_solution["individual"] = local_ga.population
                             break
                 except Exception as e:
@@ -115,7 +122,7 @@ class GeneticAlgorithmGraphColoring:
             # Spawn threads
 
             threads = []
-            n = self.number_of_colors - 2
+            n = self.number_of_colors - self.num_threads
             for colors in range(self.number_of_colors, n, -1):
                 print(f"Trying for {colors}")
                 thread = threading.Thread(target=thread_worker, args=(colors,))
@@ -128,8 +135,8 @@ class GeneticAlgorithmGraphColoring:
 
             # Final result
             print(f"\n\nBest solution found with {best_solution['colors']} colors.\n\n")
-            self.number_of_colors = best_solution['colors']
-            self.population = best_solution['population']
+            self.number_of_colors = best_solution["colors"]
+            self.population = best_solution["population"]
 
 
 
@@ -306,6 +313,7 @@ if __name__ == "__main__":
                                             0.2,
                                             10,
                                             visualise=False,
-                                            star_with_greedy=False)
+                                            start_with_greedy=True,
+                                            num_threads=3)
 
     gen_alg.start()

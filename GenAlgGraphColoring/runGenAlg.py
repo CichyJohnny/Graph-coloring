@@ -21,5 +21,5 @@ if __name__ == "__main__":
     g = representation()
     g.load_from_file(filename, start_index=1)
 
-    gen_alg = GenAlg(g, population_size, mutation_rate, crossover_rate, visualise=visualize, star_with_greedy=greedy)
+    gen_alg = GenAlg(g, population_size, mutation_rate, crossover_rate, visualise=visualize, start_with_greedy=greedy)
     gen_alg.start()
