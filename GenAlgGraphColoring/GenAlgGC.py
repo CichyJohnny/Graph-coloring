@@ -1,4 +1,6 @@
+import random
 import time
+
 import numpy as np
 import threading
 from copy import deepcopy
@@ -15,6 +17,8 @@ from src.Evaluation import Evaluation
 from src.Visualization import Visualization
 from GreedyGraphColoring.GreedyGC import GreedyGraphColoring
 
+random.seed(int(time.time()))
+np.random.seed(int(time.time()))
 
 # Genetic Algorithm for Graph Coloring with adjustable parameters
 class GeneticAlgorithmGraphColoring:
@@ -78,8 +82,6 @@ class GeneticAlgorithmGraphColoring:
 
     def single_thread(self):
         while True:
-            self.number_of_colors -= 1
-
             # Start the genetic algorithm
             self.genetic_run()
 
@@ -280,12 +282,16 @@ class GeneticAlgorithmGraphColoring:
         print(f"Greedy algorithm ended with {self.number_of_colors} colors")
         print(f"Trying with {self.number_of_colors - 1} colors")
 
+        self.number_of_colors -= 1
+
     # Start genetic algorithm with the max number of colors
     def start_normal(self) -> None:
         self.number_of_colors = self.graph.get_max_colors()
         print(f"==================================================")
         print(f"Starting with {self.number_of_colors} colors")
         print(f"Trying for {self.number_of_colors - 1} colors")
+
+        self.number_of_colors -= 1
 
 
     # Generate the initial population
@@ -322,11 +328,11 @@ if __name__ == "__main__":
     g.load_from_file('../tests/gc500.txt', 1)
 
     gen_alg = GeneticAlgorithmGraphColoring(g,
-                                            100,
+                                            20,
                                             0.5,
                                             0.5,
                                             0.2,
-                                            10,
+                                            100,
                                             visualise=False,
                                             start_with_greedy=True,
                                             num_threads=1)
