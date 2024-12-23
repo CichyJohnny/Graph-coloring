@@ -4,6 +4,7 @@ from GenAlgGC import GeneticAlgorithmGraphColoring as GenAlg
 
 import threading
 import csv
+import time
 
 import os
 import sys
@@ -26,6 +27,7 @@ def run_with_timeout(instance_, timeout, result_path="../results/result.csv"):
     g = instance_[1]()
     g.load_from_file(instance_[0], 1)
     gen_alg = GenAlg(g, *instance_[2:])
+    gen_alg.thread_timeout = time.time() + timeout
 
     print("Running algorith")
 
@@ -34,26 +36,21 @@ def run_with_timeout(instance_, timeout, result_path="../results/result.csv"):
         thread.start()
         thread.join(timeout)
 
-    print(f"Finished with: {gen_alg.number_of_colors}")
+    c = gen_alg.number_of_colors + 1
+    print(f"Finished with: {c}")
 
-
-    if thread.is_alive():
-        c = gen_alg.number_of_colors
-
-        with open(result_path, 'a+', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow([c, *instance_])
-
-        raise SystemExit
+    with open(result_path, 'a+', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow([c, *instance_])
 
 
 if __name__ == "__main__":
     ################################################################
     # Adjustable
     time_duration = 60  # seconds
-    num_tries = 5
+    num_tries = 10
 
-    test_name = "miles250"
+    test_name = "gc500"
 
     test_path = f"../tests/{test_name}.txt"
 
@@ -64,27 +61,30 @@ if __name__ == "__main__":
         [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 1, False],
         [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 1, False],
 
-        [test_path, AdjList, 20, 0.5, 0.5, 0.2, 100, False, True, 1, False],
-        [test_path, AdjList, 50, 0.5, 0.5, 0.2, 100, False, True, 1, False],
-        [test_path, AdjList, 100, 0.5, 0.5, 0.2, 100, False, True, 1, False],
+        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 2, False],
+        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 2, False],
+        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 2, False],
 
-        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 1, True],
-        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 1, True],
-        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 1, True],
+        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 3, False],
+        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 3, False],
+        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 3, False],
 
-        [test_path, AdjList, 20, 0.5, 0.5, 0.2, 100, False, True, 1, True],
-        [test_path, AdjList, 50, 0.5, 0.5, 0.2, 100, False, True, 1, True],
-        [test_path, AdjList, 100, 0.5, 0.5, 0.2, 100, False, True, 1, True],
+        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 4, False],
+        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 4, False],
+        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 4, False],
+
+        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 5, False],
+        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 5, False],
+        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 5, False],
                  ]
 
     ################################################################
 
+    print(f"Estimated time: {time_duration * num_tries * len(instances) / 60} minutes")
 
-    for instance in instances:
+    for i, instance in enumerate(instances):
+        print(f"Time left: {time_duration * num_tries * len(instances[i:]) / 60} minutes")
         print(f"Running instance: {instance}")
         for _ in range(num_tries):
-            try:
-                run_with_timeout(instance, time_duration, f"../results/{test_name}.csv")
-            except SystemExit:
-                pass
+            run_with_timeout(instance, time_duration, f"../results/{test_name}.csv")
         print("Finished instance\n\n")
