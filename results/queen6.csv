@@ -1,4 +1,0 @@
-9,../tests/queen6.txt,<class 'GraphAdjMatrix.GraphAdjMatrix'>,20,0.5,0.5,0.2,100,False,True,3,False
-8,../tests/queen6.txt,<class 'GraphAdjMatrix.GraphAdjMatrix'>,20,0.5,0.5,0.2,100,False,True,3,False
-8,../tests/queen6.txt,<class 'GraphAdjMatrix.GraphAdjMatrix'>,20,0.5,0.5,0.2,100,False,True,1,False
-8,../tests/queen6.txt,<class 'GraphAdjMatrix.GraphAdjMatrix'>,20,0.5,0.5,0.2,100,False,True,1,False

@@ -1,10 +1,9 @@
-import random
 import time
-
 import numpy as np
 import threading
+
 from joblib import Parallel, delayed
-from multiprocessing import Manager, Value
+from multiprocessing import Manager, Value, TimeoutError
 from copy import deepcopy
 from typing import Union
 
@@ -19,8 +18,6 @@ from src.Evaluation import Evaluation
 from src.Visualization import Visualization
 from GreedyGraphColoring.GreedyGC import GreedyGraphColoring
 
-random.seed(int(time.time()))
-np.random.seed(int(time.time()))
 
 # Genetic Algorithm for Graph Coloring with adjustable parameters
 class GeneticAlgorithmGraphColoring:
@@ -34,12 +31,7 @@ class GeneticAlgorithmGraphColoring:
                  visualise: bool=False,
                  start_with_greedy: bool=False,
                  num_threads: int=1,
-                 rd_seed: bool=False
                  ):
-
-        if rd_seed:
-            random.seed(int(time.time()))
-            np.random.seed(int(time.time()))
 
         # Graph settings
         self.graph = graph
@@ -69,6 +61,7 @@ class GeneticAlgorithmGraphColoring:
         self.mutator = Mutation(self.chromosome_size, self.graph)
         self.evaluator = Evaluation(self.graph)
 
+        # Only for timeout thread testing
         self.thread_timeout = None
 
 
@@ -133,28 +126,26 @@ class GeneticAlgorithmGraphColoring:
                     threads_solution_found = manager.Value('i', 0)  # Shared flag to indicate if a solution is found
 
                     # Parallel execution using Joblib
-                    n = self.number_of_colors - self.num_threads
-                    print(list(range(self.number_of_colors, n, -1)))
+                    n = max(self.number_of_colors - self.num_threads, 2)
 
+                    # Get remaining time and set it to the thread timeout
                     if not self.thread_timeout is None:
-                        left_time = int(self.thread_timeout - time.time())
+                        remaining_time = int(self.thread_timeout - time.time())
                     else:
-                        left_time = self.thread_timeout
+                        remaining_time = None
 
-                    Parallel(n_jobs=self.num_threads, timeout=left_time)(
-                        delayed(thread_worker)(colors, threads_best_solution, threads_solution_found) for colors in
-                        range(self.number_of_colors, n, -1)
+                    # Spawn and start the threads for self.number_of_colors to n
+                    Parallel(n_jobs=self.num_threads, timeout=remaining_time)(
+                        delayed(thread_worker)(colors, threads_best_solution, threads_solution_found)
+                        for colors in range(self.number_of_colors, n, -1)
                     )
 
                     # Final result
-                    print(f"\n")
                     self.number_of_colors = threads_best_solution["colors"] - 1
                     self.population = threads_best_solution["population"]
-            except Exception:
+            except TimeoutError:
                 return
 
-    def stop(self):
-        raise Exception("Stop")
 
     # Single run of the genetic algorithm
     def genetic_run(self, solution_found: Manager=None) -> None:
@@ -171,7 +162,8 @@ class GeneticAlgorithmGraphColoring:
         generation = 0
         # While loop for genetic algorithm generations
         while best_fit != 0:
-            # Only if one of multiple threads
+            # Stop the loop if a solution is found
+            # If many threads are running, solution_found is not None
             if not solution_found is None:
                 if solution_found.value:
                     return
@@ -213,7 +205,7 @@ class GeneticAlgorithmGraphColoring:
                 Visualization.visualize(generation, best_fitness_list, self.number_of_colors)
 
 
-            self.summarise_generation(generation)
+            self.summarise_single_run(generation, solution_found)
 
             self.number_of_colors -= 1
 
@@ -265,12 +257,14 @@ class GeneticAlgorithmGraphColoring:
                 self.randomness_rate = self.const_randomness_rate
 
     # Print the summary of the generation
-    def summarise_generation(self, generation) -> None:
-        # print(f"==================================================")
-        # print(f"Succeeded for {self.number_of_colors} colors")
-        # print(f"In {generation} generations")
-        # print(f"Trying for {self.number_of_colors - 1} colors")'
-        pass
+    def summarise_single_run(self, generation, solution_found: Manager=None) -> None:
+        # Don't print if many threads are running
+        # If many threads are running, solution_found is not None
+        if solution_found is None:
+            print(f"==================================================")
+            print(f"Succeeded for {self.number_of_colors} colors")
+            print(f"In {generation} generations")
+            print(f"Trying for {self.number_of_colors - 1} colors")
 
 
     # Start genetic algorithm where the greedy algorithm ended
@@ -343,7 +337,6 @@ if __name__ == "__main__":
                                             1000,
                                             visualise=False,
                                             start_with_greedy=True,
-                                            num_threads=3,
-                                            rd_seed=True)
+                                            num_threads=3)
 
     gen_alg.start()

@@ -1,4 +1,4 @@
-from GraphAdjList import GraphAdjList as AdjList
+# from GraphAdjList import GraphAdjList as AdjList
 from GraphAdjMatrix import GraphAdjMatrix as AdjMatrix
 from GenAlgGC import GeneticAlgorithmGraphColoring as GenAlg
 
@@ -47,7 +47,7 @@ def run_with_timeout(instance_, timeout, result_path="../results/result.csv"):
 if __name__ == "__main__":
     ################################################################
     # Adjustable
-    time_duration = 60  # seconds
+    time_duration = 6  # seconds
     num_tries = 10
 
     test_name = "gc500"
@@ -57,25 +57,25 @@ if __name__ == "__main__":
     # Instance: [path, Graph class, population_size, mutation_rate, crossover_rate,
     # randomness_rate, increase_randomness_rate, visualize, start_with_greedy, num_threads, use_seed]
     instances = [
-        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 1, False],
-        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 1, False],
-        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 1, False],
+        # [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 1],
+        # [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 1],
+        # [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 1],
 
-        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 2, False],
-        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 2, False],
-        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 2, False],
+        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 2],
+        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 2],
+        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 2],
 
-        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 3, False],
-        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 3, False],
-        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 3, False],
+        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 3],
+        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 3],
+        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 3],
 
-        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 4, False],
-        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 4, False],
-        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 4, False],
+        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 4],
+        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 4],
+        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 4],
 
-        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 5, False],
-        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 5, False],
-        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 5, False],
+        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 5],
+        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 5],
+        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 5],
                  ]
 
     ################################################################
