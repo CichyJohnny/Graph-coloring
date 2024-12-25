@@ -198,7 +198,7 @@ class GeneticAlgorithmGraphColoring:
             self.start_mutation(copy_population)
 
 
-            self.end_generation(generation, best_fit, best_fitness_list)
+            self.end_generation(generation, best_fit, best_fitness_list, solution_found=solution_found)
 
 
         # If found a solution, print the summary and go next
@@ -211,7 +211,7 @@ class GeneticAlgorithmGraphColoring:
                 Visualization.visualize(generation, best_fitness_list, self.number_of_colors)
 
 
-            self.summarise_single_run(generation, solution_found)
+            self.summarise_single_run(generation, solution_found=solution_found)
 
             self.number_of_colors -= 1
 
@@ -247,14 +247,15 @@ class GeneticAlgorithmGraphColoring:
 
 
     # End of the generation, add the new population to the old one
-    def end_generation(self, generation: int, best_fit: int, best_fitness_list: list[int]) -> None:
+    def end_generation(self, generation: int, best_fit: int, best_fitness_list: list[int], solution_found: Manager=None) -> None:
         self.evaluator.evaluate_population_vectorized(self.next_population)
         self.population = self.population[:self.population_size//2]
         self.population.extend(self.next_population)
 
         step = self.increase_randomness_step
         if generation % step == 0:
-            print(f"{generation}:{best_fit} for {threading.current_thread().ident} thread")
+            if solution_found is None:
+                print(f"{generation}:{best_fit} for {threading.current_thread().ident} thread")
 
             if len(set(best_fitness_list[:step:-1])) == 1:
                 # If the best fitness is the same for the last 10 generations
