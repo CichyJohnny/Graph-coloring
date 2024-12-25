@@ -1,4 +1,4 @@
-# from GraphAdjList import GraphAdjList as AdjList
+from GraphAdjList import GraphAdjList as AdjList
 from GraphAdjMatrix import GraphAdjMatrix as AdjMatrix
 from GenAlgGC import GeneticAlgorithmGraphColoring as GenAlg
 
@@ -37,7 +37,7 @@ def run_with_timeout(instance_, timeout, result_path="../results/result.csv"):
         thread.join(timeout)
 
     c = gen_alg.number_of_colors + 1
-    print(f"Finished with: {c}")
+    # print(f"Finished with: {c}")
 
     with open(result_path, 'a+', newline='') as f:
         writer = csv.writer(f)
@@ -47,44 +47,68 @@ def run_with_timeout(instance_, timeout, result_path="../results/result.csv"):
 if __name__ == "__main__":
     ################################################################
     # Adjustable
-    time_duration = 6  # seconds
-    num_tries = 10
+    time_duration = 60  # seconds
+    num_tries = 3
 
-    test_name = "gc500"
+    test_names = ["anna", "david", "gc500", "gc1000", "homer", "le450_5a", "miles250",
+                  "myciel4", "myciel5", "myciel6", "queen6", "queen7"]
 
-    test_path = f"../tests/{test_name}.txt"
-
+    # TODO: Read instances from file
     # Instance: [path, Graph class, population_size, mutation_rate, crossover_rate,
-    # randomness_rate, increase_randomness_rate, visualize, start_with_greedy, num_threads, use_seed]
+    # randomness_rate, increase_randomness_rate, visualize, start_with_greedy, num_threads, mutate_parents]
     instances = [
-        # [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 1],
-        # [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 1],
-        # [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 1],
+        [AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 1, False],
+        [AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 1, False],
 
-        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 2],
-        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 2],
-        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 2],
+        [AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 2, False],
+        [AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 2, False],
 
-        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 3],
-        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 3],
-        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 3],
+        [AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 3, False],
+        [AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 3, False],
 
-        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 4],
-        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 4],
-        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 4],
 
-        [test_path, AdjMatrix, 20, 0.5, 0.5, 0.2, 100, False, True, 5],
-        [test_path, AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 5],
-        [test_path, AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 5],
+        [AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 1, True],
+        [AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 1, True],
+
+        [AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 2, True],
+        [AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 2, True],
+
+        [AdjMatrix, 50, 0.5, 0.5, 0.2, 100, False, True, 3, True],
+        [AdjMatrix, 100, 0.5, 0.5, 0.2, 100, False, True, 3, True],
+
+
+
+        [AdjList, 50, 0.5, 0.5, 0.2, 100, False, True, 1, False],
+        [AdjList, 100, 0.5, 0.5, 0.2, 100, False, True, 1, False],
+
+        [AdjList, 50, 0.5, 0.5, 0.2, 100, False, True, 2, False],
+        [AdjList, 100, 0.5, 0.5, 0.2, 100, False, True, 2, False],
+
+        [AdjList, 50, 0.5, 0.5, 0.2, 100, False, True, 3, False],
+        [AdjList, 100, 0.5, 0.5, 0.2, 100, False, True, 3, False],
+
+
+        [AdjList, 50, 0.5, 0.5, 0.2, 100, False, True, 1, True],
+        [AdjList, 100, 0.5, 0.5, 0.2, 100, False, True, 1, True],
+
+        [AdjList, 50, 0.5, 0.5, 0.2, 100, False, True, 2, True],
+        [AdjList, 100, 0.5, 0.5, 0.2, 100, False, True, 2, True],
+
+        [AdjList, 50, 0.5, 0.5, 0.2, 100, False, True, 3, True],
+        [AdjList, 100, 0.5, 0.5, 0.2, 100, False, True, 3, True],
                  ]
 
     ################################################################
 
-    print(f"Estimated time: {time_duration * num_tries * len(instances) / 60} minutes")
+    for i, test_name in enumerate(test_names):
+        print("Running test: ", test_name)
 
-    for i, instance in enumerate(instances):
-        print(f"Time left: {time_duration * num_tries * len(instances[i:]) / 60} minutes")
-        print(f"Running instance: {instance}")
-        for _ in range(num_tries):
-            run_with_timeout(instance, time_duration, f"../results/{test_name}.csv")
-        print("Finished instance\n\n")
+        for j, instance in enumerate(instances):
+            print(f"Running instance: {instance}")
+            instance = [f"../tests/{test_name}.txt", *instance]
+
+            print(f"Time left: {round(len(test_names[i:]) * time_duration * num_tries * len(instances[j:]) / 60, 2)} minutes")
+            for _ in range(num_tries):
+                run_with_timeout(instance, time_duration, f"../results/{test_name}.csv")
+
+            print("Finished instance\n\n")
