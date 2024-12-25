@@ -81,12 +81,13 @@ class GeneticAlgorithmGraphColoring:
             print(f"{self.num_threads} threads approach")
             self.multiple_thread()
 
-
+    # Single thread approach
     def single_thread(self):
         while True:
             # Start the genetic algorithm
             self.genetic_run()
 
+    # Multiple threads approach wirth worker threads for each number of colors
     def multiple_thread(self):
         def thread_worker(starting_number_of_colors: int, solution: dict, found: Value) -> None:
             # Thread-specific genetic run
@@ -113,8 +114,10 @@ class GeneticAlgorithmGraphColoring:
                     found.value = 1
                     solution["colors"] = local_ga.number_of_colors + 1
                     solution["population"] = local_ga.population
+
                     return
             return
+
 
         while True:
             try:
@@ -143,6 +146,7 @@ class GeneticAlgorithmGraphColoring:
                     # Final result
                     self.number_of_colors = threads_best_solution["colors"] - 1
                     self.population = threads_best_solution["population"]
+
             except TimeoutError:
                 return
 

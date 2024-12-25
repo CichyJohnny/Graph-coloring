@@ -43,7 +43,4 @@ class Mutation:
                     else:
                         chromosome[a] = random.randint(0, number_of_colors - 1)
 
-
-                    # chromosome[a] = random.randint(0, number_of_colors)
-
         return population
