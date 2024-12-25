@@ -8,7 +8,7 @@ from GreedyGraphColoring.GreedyGC import GreedyGraphColoring
 
 ################################################################
 # Adjustable
-filename = 'tests/test_100-0.3-1405.txt'
+filename = 'tests/queen6.txt'
 algorithm = GreedyGraphColoring
 ################################################################
 
