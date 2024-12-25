@@ -31,6 +31,7 @@ class GeneticAlgorithmGraphColoring:
                  visualise: bool=False,
                  start_with_greedy: bool=False,
                  num_threads: int=1,
+                 mutate_parents: bool=False,
                  ):
 
         # Graph settings
@@ -45,6 +46,7 @@ class GeneticAlgorithmGraphColoring:
         self.const_randomness_rate = randomness_rate
         self.increase_randomness_step = increase_randomness_step
         self.num_threads = num_threads
+        self.mutate_parents = mutate_parents
 
         # Settings for genetic run
         self.population = None
@@ -223,7 +225,13 @@ class GeneticAlgorithmGraphColoring:
         # Parents are randomness_rate % of parents_size, the rest is selected by roulette wheel
         parents = list(random_parents + selection_parents)[:parents_size]
 
-        self.next_population.extend(self.crossover.crossover(parents))
+        if self.mutate_parents:
+            children = self.crossover.crossover(parents)
+            children = self.mutator.mutation(children, self.number_of_colors)
+
+            self.next_population.extend(children)
+        else:
+            self.next_population.extend(self.crossover.crossover(parents))
 
     # Initialize and perform the mutation process
     def start_mutation(self, copy_population: list[Individual]) -> None:
@@ -341,6 +349,7 @@ if __name__ == "__main__":
                                             1000,
                                             visualise=False,
                                             start_with_greedy=True,
-                                            num_threads=3)
+                                            num_threads=3,
+                                            mutate_parents=True)
 
     gen_alg.start()
